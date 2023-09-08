@@ -1,7 +1,8 @@
 venv/
 .env
 .vscode/*
+.vscode
 .cache
 media
+complaint_attachments/
 __pycache__
-
