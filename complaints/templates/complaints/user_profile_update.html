@@ -1,0 +1,99 @@
+{% extends "complaints/base.html" %}
+{% load static %}
+
+
+{% block title %}
+    Complaints management System
+{% endblock title %}
+
+{% block style %}
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{% static 'assets/css/login.css' %}">
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{% endblock style %}
+
+{% block content %}
+ 
+		<section class="ftco-section">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-md-7 col-lg-5">
+						<div class="login-wrap p-4 p-md-5">
+							<h3 class="mb-4">Update Profile</h3>
+							<form method="post" class="signup-form my-5">
+								{% csrf_token %}
+                                {{ form.non_field_errors }}
+								<div class="form-group">
+
+									{{ form.first_name.errors }}
+									{{form.first_name.label_tag}}
+									{{ form.first_name }}
+
+								</div>
+
+								<div class="form-group">
+
+									{{ form.last_name.errors }}
+									{{form.last_name.label_tag}}
+									{{ form.last_name }}
+
+								</div>
+
+								<div class="form-group">
+
+									{{ form.username.errors }}
+									{{form.username.label_tag}}
+									{{ form.username }}
+
+								</div>
+								<div class="form-group">
+
+									{{ form.email.errors }}
+									{{form.email.label_tag}}
+									{{ form.email }}
+
+								</div>
+								<div class="form-group">
+
+									{{ form.profile_picture.errors }}
+									{{form.profile_picture.label_tag}}
+									{{ form.profile_picture }}
+
+                                </div>
+								<div class="form-group">
+
+									{{ form.phone_number.errors }}
+									{{form.phone_number.label_tag}}
+									{{ form.phone_number }}
+
+								</div>
+								<div class="form-group">
+
+									{{ form.residence_address.errors }}
+									{{form.residence_address.label_tag}}
+									{{form.residence_address}}
+
+								</div>
+								<div class="form-group d-flex justify-content-end"><abbr title="submit">
+									<button type="submit" class="btn btn-primary submit"><span class="fa fa-check"></span></button>
+									</abbr>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+    <div class="container py-3">
+
+{% endblock content %}
+
+{% block js %}
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/js/popper.js' %}"></script>
+	<script src="{% static 'js/bootstrap.js' %}"></script>
+	<script src="{% static 'assets/js/login.js' %}"></script>
+{% endblock js %}
+

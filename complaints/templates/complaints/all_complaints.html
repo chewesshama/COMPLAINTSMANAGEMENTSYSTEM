@@ -1,0 +1,58 @@
+{% extends "complaints/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <!-- ======= List of the Employees complaints ======= -->
+    <section id="faq" class="faq section-bg">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>List of Complaints</h2>
+          <p>List of complaints given out by different Company Eployees and staffs.</p>
+        </div>
+
+        <div class="faq-list">
+          <ul>
+            {% for complaint in complaints %}
+                    <li data-aos="fade-up" data-aos-delay="iterator">
+                    <i class="bx bx-help-circle icon-help"></i> <a data-bs-toggle="collapse" data-bs-target="#faq-list-2" class="collapsed"> {{complaint.title}} <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                    <div id="faq-list-2" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                        {{complaint.description}}
+                        </p>
+                    </div>
+                    </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </section><!-- End List of the Employees complaints -->
+
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <div class="footer-top">
+        <div class="container">
+
+            <div class="row  justify-content-center">
+            <div class="col-lg-6">
+                <h4>Complaints Management System</h4>
+            </div>
+            </div>
+
+            <div class="container footer-bottom clearfix">
+        <div class="copyright">
+            &copy; Copyright <strong><span>IctPack</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+            Designed by <a href="#">Shama Chewes</a>
+        </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+{% endblock content %}

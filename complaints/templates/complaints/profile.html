@@ -1,0 +1,36 @@
+{% extends "complaints/base.html" %}
+{% load static %}
+
+{% block title %}
+
+    Profile Page For CMS User
+  
+{% endblock title %}
+
+{% block content %}
+
+    <div class="conent-section container py-3">
+        <div class="media">
+            <img src="{{ user.profile_picture.url }}" class="rounded-circle account-img"" style="height: 100px; width: 100px;">
+            <div class="media-body">
+                <h2 class="account-heading my-2"> {{user.first_name|upper}} {{user.last_name|upper}}</h2>
+                <p class="text-secondary">Username: {{ user.username }} </p>
+                <p class="text-secondary">Email: {{ user.email }}</p>
+                <p class="text-secondary">Residence Address: {{user.residence_address}}</p>
+                <p class="text-secondary">Phone Number: {{user.phone_number}}</p>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:profile_update' user.pk %}" class="nav-link text-light">Profile Update</a></button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:password_change' %}" class="nav-link text-light">Change Password</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+{% endblock content %}
+
+
