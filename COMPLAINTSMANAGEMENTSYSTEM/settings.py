@@ -72,7 +72,7 @@ WSGI_APPLICATION = "COMPLAINTSMANAGEMENTSYSTEM.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.emviron.get('DB_NAME'),
+        "NAME": os.environ.get('DB_NAME'),
         "USER": os.environ.get('DB_USER'),
         "PASSWORD": os.environ.get('DB_PASS'),
         "HOST": "localhost",
