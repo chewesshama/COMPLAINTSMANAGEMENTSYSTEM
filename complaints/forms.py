@@ -4,6 +4,7 @@ from .models import User, Department
 from django.contrib.auth.models import Group
 
 
+
 class CEORegistrationForm(UserCreationForm):
     password1 = forms.CharField(
         label="Password",

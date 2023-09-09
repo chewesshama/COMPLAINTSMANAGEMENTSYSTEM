@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "mikoa",
     "PIL",
     "complaints.apps.ComplaintsConfig",
     "crispy_forms",
@@ -127,12 +126,12 @@ AUTH_GROUP_MODEL = "complaints.UserType"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("shamachewes99@gmail.com")
-EMAIL_HOST_PASSWORD = os.environ.get("")
+#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#EMAIL_HOST = "smtp.gmail.com"
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = os.environ.get("shamachewes99@gmail.com")
+#EMAIL_HOST_PASSWORD = os.environ.get("")
 
 
 # Default primary key field type
@@ -151,6 +150,6 @@ LOGIN_REDIRECT_URL = "complaints:home"
 
 LOGIN_URL = "complaints:login"
 
-LOGOUT_REDIRECT_URL = "complaints:index"
+LOGOUT_REDIRECT_URL = "complaints:login"
 
 

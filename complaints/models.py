@@ -1,5 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
+from mtaa import tanzania
+
+class ResidenceAddress(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = [(address, address) for address in tanzania]
+        kwargs['max_length'] = 100
+        super().__init__(*args, **kwargs)
 
 
 class Department(models.Model):
@@ -28,7 +35,7 @@ class User(AbstractUser):
     departments = models.ManyToManyField(Department)
     profile_picture = models.ImageField(upload_to='profile_pictures/', default='default_pic.jpg', blank=True, null=True)
     phone_number = models.CharField(max_length=15)
-    residence_address = models.CharField(max_length=50)
+    residence_address = ResidenceAddress(blank=True, null=True)
     
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)

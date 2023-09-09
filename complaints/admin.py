@@ -16,3 +16,7 @@ admin.site.register(Department)
 admin.site.register(Complaint)
 admin.site.register(Remark)
 admin.site.register(ComplaintAttachments)
+
+
+admin.site.site_header = 'CMS admin area'
+#admin.site.site_title = ''
