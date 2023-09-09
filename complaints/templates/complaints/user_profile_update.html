@@ -69,11 +69,16 @@
 
 								</div>
 								<div class="form-group">
-
-									{{ form.residence_address.errors }}
-									{{form.residence_address.label_tag}}
-									{{form.residence_address}}
-
+									<label for="{{ form.residence_region.id_for_label }}">Region:</label>
+									{{ form.residence_region }}
+								</div>
+								<div class="form-group">
+									<label for="{{ form.residence_district.id_for_label }}">District:</label>
+									<select id="{{ form.residence_district.id_for_label }}" name="{{ form.residence_district.name }}"></select>
+								</div>
+								<div class="form-group">
+									<label for="{{ form.residence_ward.id_for_label }}">Ward:</label>
+									<select id="{{ form.residence_ward.id_for_label }}" name="{{ form.residence_ward.name }}"></select>
 								</div>
 								<div class="form-group d-flex justify-content-end"><abbr title="submit">
 									<button type="submit" class="btn btn-primary submit"><span class="fa fa-check"></span></button>
@@ -95,5 +100,49 @@
 	<script src="{% static 'assets/js/popper.js' %}"></script>
 	<script src="{% static 'js/bootstrap.js' %}"></script>
 	<script src="{% static 'assets/js/login.js' %}"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			// Initially, hide district and ward fields
+			$('#id_residence_district').hide();
+			$('#id_residence_ward').hide();
+
+			// When a region is selected, fetch related districts via AJAX
+			$('#id_residence_region').on('change', function () {
+				var regionId = $(this).val();
+				if (regionId) {
+					$('#id_residence_district').show();
+					$.ajax({
+						url: '/get_districts/',  // Create a Django view to fetch districts for the selected region
+						data: { 'region_id': regionId },
+						success: function (data) {
+							$('#id_residence_district').html(data);
+						}
+					});
+				} else {
+					$('#id_residence_district').hide();
+					$('#id_residence_ward').hide();
+				}
+			});
+
+			// When a district is selected, fetch related wards via AJAX
+			$('#id_residence_district').on('change', function () {
+				var districtId = $(this).val();
+				if (districtId) {
+					$('#id_residence_ward').show();
+					$.ajax({
+						url: '/get_wards/',  // Create a Django view to fetch wards for the selected district
+						data: { 'district_id': districtId },
+						success: function (data) {
+							$('#id_residence_ward').html(data);
+						}
+					});
+				} else {
+					$('#id_residence_ward').hide();
+				}
+			});
+		});
+	</script>
+
 {% endblock js %}
 
