@@ -19,8 +19,6 @@ urlpatterns = [
     path('delete_user/<int:pk>/', DeleteUserView.as_view(), name='delete_user'),
     path('password_change/', PasswordChangeCustomView.as_view(), name='password_change'),
     path('password_change_done/', PasswordChangeDoneView.as_view(), name='password_change_done'),
-#    path('get_districts/', get_districts, name='get_districts'),
-#    path('get_wards/', get_wards, name='get_wards'),
 
 ]
 

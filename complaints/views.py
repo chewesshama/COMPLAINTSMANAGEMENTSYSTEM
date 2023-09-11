@@ -11,39 +11,6 @@ from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm
 from .models import Complaint, User
-#from django.http import JsonResponse
-#from mtaa import tanzania
-
-
-
-#def get_districts(request):
-#    region_name = request.GET.get('region_name')
-#
-#    if hasattr(tanzania, region_name):
-#        if hasattr(region, 'districts'):
-#            districts = region.districts
-#            district_names = [district for district in districts]
-#            return JsonResponse(district_names, safe=False)
-#
-#    return JsonResponse([], safe=False)
-
-
-#def get_wards(request):
-#    district_name = request.GET.get('district_name')
-#    ward_names = []
-#
-#    if hasattr(tanzania, district_name):
-#        district = getattr(tanzania, district_name)
-#
-#        if hasattr(district, 'wards'):
-#            wards = district.wards
-#            # Append ward names to the list
-#            ward_names.extend(wards)
-#
-#    if ward_names:
-#        return JsonResponse(ward_names, safe=False)
-#
-#    return JsonResponse([], safe=False)
 
 
 
