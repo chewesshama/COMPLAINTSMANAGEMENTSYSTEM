@@ -57,7 +57,7 @@
                                             {% endfor %}
                                         </td>
                                         <td> {{ user.phone_number }} </td>
-                                        <td> {{ user.residence_address|capfirst }} </td>
+                                        <td> {{ user.location|capfirst }} </td>
                                         <td>
                                             {% if user.username != request.user.username %}
                                                 <button type="submit" class="btn btn-danger m-1 btn-sm">DELETE</button>

@@ -26,9 +26,10 @@ STATUS_CHOICES = (
 
 
 class User(AbstractUser):
-    departments = models.ManyToManyField(Department)
+    departments = models.ManyToManyField(Department, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', default='default_pic.jpg', blank=True, null=True)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, blank=True)
+    location = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)

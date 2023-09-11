@@ -63,7 +63,7 @@
 
                 {% elif user|has_group:'HOD' %}
 
-                  <li><a class="nav-link scrollto active" href="{% url 'complaints:index' %}">Home</a></li>
+                  <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
                   <li><a class="nav-link scrollto" href="#MyComplaints">My complaints</a></li>
                   <li><a class="nav-link scrollto" href="#">Department Complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:all_users_display' %}">Department Employees</a></li>
@@ -74,7 +74,7 @@
 
                 {% else %}
                 
-                  <li><a class="nav-link scrollto active" href="{% url 'complaints:index' %}">Home</a></li>
+                  <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
                   <li><a class="nav-link scrollto" href="#myComplaints">My Complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>

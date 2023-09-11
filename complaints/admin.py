@@ -4,13 +4,22 @@ from .models import User, Complaint, Department, Remark, ComplaintAttachments
 
 
 class CustomUserAdmin(UserAdmin):
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        if 'CEO' in [group.name for group in obj.groups.all()] or 'HOD' in [group.name for group in obj.groups.all()]:
-            obj.is_staff = True
-            obj.save()
+    fieldsets = (
+        ("User details", {
+            "fields": [
+                "username",
+                "first_name",
+                "last_name",
+                "email",
+                "is_superuser",
+                "is_staff",
+                "departments",
+                "profile_picture",
+                "phone_number",
+                "location",
+            ],
+        }),
+    )
 
 
 admin.site.register(User, CustomUserAdmin)

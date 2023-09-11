@@ -11,7 +11,11 @@
 
     <div class="conent-section container py-3">
         <div class="media">
-            <img src="{{ user.profile_picture.url }}" class="rounded-circle account-img"" style="height: 100px; width: 100px;">
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" class="rounded-circle account-img"" style="height: 100px; width: 100px;" alt="{{ user_profile.user.username }}'s Profile Image">
+            {% else %}
+                <img src="{% static 'default_pic.png' %}" class="rounded-circle account-img"" style="height: 100px; width: 100px;" alt="Default Profile Image">
+            {% endif %}
             <div class="media-body">
                 <h2 class="account-heading my-2"> {{user.first_name|upper}} {{user.last_name|upper}}</h2>
                 <p class="text-secondary">Username: {{ user.username }} </p>

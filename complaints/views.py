@@ -14,6 +14,15 @@ from .models import Complaint, User
 
 
 
+def add_user_to_group(user, group_name):
+    try:
+        group = Group.objects.get(name=group_name)
+    except Group.DoesNotExist:
+        pass
+    else:
+        group.user_set.add(user)
+
+
 class IndexView(TemplateView):
     template_name = 'complaints/index.html'
 
@@ -61,11 +70,13 @@ class UserRegistrationView(PermissionRequiredMixin ,CreateView):
             user.departments.set([department])
             group = form.cleaned_data.get('group')
 
-            if group == 'CEO' or group == 'HOD':
+            if group.name == 'CEO' or group.name == 'HOD':
                 user.is_staff = True
-                user.groups.set([group])
+                add_user_to_group(user, group)
+                user.save()
             else:
-                user.groups.set([group])
+                add_user_to_group(user, group)
+                user.save()
         elif user_group and user_group.name == 'HOD':
             user.departments.set([self.request.user.departments.first()])
             user.groups.set([Group.objects.get(name='EMPLOYEE')])
@@ -114,6 +125,8 @@ def userProfileUpdateView(request, pk):
             return redirect(profile_url)
     else:
         form = UserProfileForm(instance=request.user)
+        
+    
 
     context = {
         'form': form,
@@ -156,7 +169,8 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
             order=Case(
                 When(groups__name='CEO', then=Value(1)),
                 When(groups__name='HOD', then=Value(2)),
-                default=Value(3),
+                When(groups__name='EMPLOYEE', then=Value(3)),
+                default=Value(4),
                 output_field=IntegerField(),
             )
         )
@@ -176,13 +190,14 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
                 output_field=CharField(),
             )
         ).order_by('is_logged_in_user', 'order', 'username')
-        
+
         if search_query:
             queryset = queryset.filter(Q(username__icontains=search_query) |
                                        Q(email__icontains=search_query) |
                                        Q(first_name__icontains=search_query) |
                                        Q(last_name__icontains=search_query))
         
+        queryset = queryset.filter(is_superuser=False)
         return queryset
 
 

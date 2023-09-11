@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from .models import User, Department
 from django.contrib.auth.models import Group
+from mtaa import tanzania
 
 
 
@@ -18,7 +19,7 @@ class CEORegistrationForm(UserCreationForm):
 
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
-        required=False,
+        required=True,
         label="Department",
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
@@ -66,9 +67,30 @@ class LoginForm(AuthenticationForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    REGION_CHOICES = [(region, region) for region in tanzania]
+
+    location = forms.ChoiceField(
+        choices=REGION_CHOICES,
+        label="location",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+#    def __init__(self, *args, **kwargs):
+#        super(UserProfileForm, self).__init__(*args, **kwargs)
+#        self.fields['residence_district'] = forms.ChoiceField(
+#            choices=[],
+#            label="District",
+#            widget=forms.Select(attrs={'class': 'form-control'}),
+#        )
+#        self.fields['residence_ward'] = forms.ChoiceField(
+#            choices=[],
+#            label="Ward",
+#            widget=forms.Select(attrs={'class': 'form-control'}),
+#        )
+
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email','profile_picture', 'phone_number')
+        fields = ('first_name', 'last_name', 'username', 'email','profile_picture', 'phone_number', 'location')
 
 
 class UserSearchForm(forms.Form):
