@@ -73,7 +73,7 @@ class UserRegistrationView(PermissionRequiredMixin ,CreateView):
     def get_form_class(self):
         for group in self.request.user.groups.all():
             user_type = group.name if self.request.user.is_authenticated else 'CEO'
-            if user_type == 'CEO':
+            if user_type == 'CEO' or self.request.user.is_superuser:
                 return CEORegistrationForm
             elif user_type == 'HOD':
                 return HODRegistrationForm
@@ -90,7 +90,7 @@ class UserRegistrationView(PermissionRequiredMixin ,CreateView):
 
         user.save()
 
-        if user_group and user_group.name == 'CEO':
+        if user_group and (user_group.name == 'CEO' or self.request.user.is_superuser):
             user.departments.set([department])
             group = form.cleaned_data.get('group')
 
@@ -175,12 +175,12 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
     model = User
     template_name = 'complaints/all_users.html'
     context_object_name = 'users'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_search_form'] = UserSearchForm(self.request.GET)
         return context
-    
+
     def get_queryset(self):
         user = self.request.user
         search_query = self.request.GET.get('search_query')
@@ -196,7 +196,11 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
 
         if user.groups.filter(name='HOD').exists():
             department = user.departments.first()
-            queryset = queryset.filter(Q(departments=department) | Q(pk=user.pk))
+            if department:
+                queryset = queryset.exclude(departments=None)
+                queryset = queryset.filter(Q(departments=department) | Q(pk=user.pk))
+            else:
+                queryset = queryset.filter(pk=user.pk)
 
         queryset = queryset.annotate(
             is_logged_in_user=Case(
