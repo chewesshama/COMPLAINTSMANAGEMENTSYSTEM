@@ -76,10 +76,6 @@
 									<label for="{{ form.residence_district.id_for_label }}">District:</label>
 									<select id="{{ form.residence_district.id_for_label }}" name="{{ form.residence_district.name }}"></select>
 								</div>
-								<div class="form-group">
-									<label for="{{ form.residence_ward.id_for_label }}">Ward:</label>
-									<select id="{{ form.residence_ward.id_for_label }}" name="{{ form.residence_ward.name }}"></select>
-								</div>
 								<div class="form-group d-flex justify-content-end"><abbr title="submit">
 									<button type="submit" class="btn btn-primary submit"><span class="fa fa-check"></span></button>
 									</abbr>
@@ -103,44 +99,61 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		$(document).ready(function () {
-			// Initially, hide district and ward fields
-			$('#id_residence_district').hide();
-			$('#id_residence_ward').hide();
+			var regionSelect = $('#{{ form.residence_region.id_for_label }}');
+			var districtSelect = $('#{{ form.residence_district.id_for_label }}');
+			var wardSelect = $('#{{ form.residence_ward.id_for_label }}');
 
-			// When a region is selected, fetch related districts via AJAX
-			$('#id_residence_region').on('change', function () {
-				var regionId = $(this).val();
-				if (regionId) {
-					$('#id_residence_district').show();
+			districtSelect.hide();
+			wardSelect.hide();
+
+			regionSelect.on('change', function () {
+				var selectedRegion = $(this).val();
+				if (selectedRegion) {
+					districtSelect.show();
+					wardSelect.hide();
+
 					$.ajax({
-						url: '/get_districts/',  // Create a Django view to fetch districts for the selected region
-						data: { 'region_id': regionId },
+						url: '/get_districts/?region_name=' + selectedRegion,
 						success: function (data) {
-							$('#id_residence_district').html(data);
+							districtSelect.empty();
+
+							data.forEach(function (district) {
+								districtSelect.append($('<option>', {
+									value: district,
+									text: district
+								}));
+							});
+
 						}
 					});
 				} else {
-					$('#id_residence_district').hide();
-					$('#id_residence_ward').hide();
+					districtSelect.hide();
+					wardSelect.hide();
 				}
 			});
 
-			// When a district is selected, fetch related wards via AJAX
-			$('#id_residence_district').on('change', function () {
-				var districtId = $(this).val();
-				if (districtId) {
-					$('#id_residence_ward').show();
-					$.ajax({
-						url: '/get_wards/',  // Create a Django view to fetch wards for the selected district
-						data: { 'district_id': districtId },
-						success: function (data) {
-							$('#id_residence_ward').html(data);
-						}
-					});
-				} else {
-					$('#id_residence_ward').hide();
-				}
-			});
+//			districtSelect.on('change', function () {
+//				var selectedDistrict = $(this).val();
+//				if (selectedDistrict) {
+//					wardSelect.show();
+//					$.ajax({
+//						url: '/get_wards/?district_name=' + selectedDistrict,
+//						success: function (data) {
+//							wardSelect.empty();
+//
+//							data.forEach(function (ward) {
+//								wardSelect.append($('<option>', {
+//									value: ward,
+//									text: ward
+//								}));
+//							});
+//
+//						}
+//					});
+//				} else {
+//					wardSelect.hide();
+//				}
+//			});
 		});
 	</script>
 

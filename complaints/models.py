@@ -25,6 +25,26 @@ STATUS_CHOICES = (
         ('Closed', 'Closed'),
     )
 
+class Region(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class District(models.Model):
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+#class Ward(models.Model):
+#    name = models.CharField(max_length=100)
+#    district = models.ForeignKey(District, on_delete=models.CASCADE)
+#
+#    def __str__(self):
+#        return self.name
+
 
 class User(AbstractUser):
     departments = models.ManyToManyField(Department)
@@ -32,7 +52,7 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15)
     residence_region = models.CharField(max_length=100, blank=True, null=True)
     residence_district = models.CharField(max_length=100, blank=True, null=True)
-    residence_ward = models.CharField(max_length=100, blank=True, null=True)
+#    residence_ward = models.CharField(max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)

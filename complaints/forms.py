@@ -24,7 +24,7 @@ class CEORegistrationForm(UserCreationForm):
         label="Department",
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
-    
+
     group = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=True,
@@ -57,12 +57,12 @@ class LoginForm(AuthenticationForm):
         label="Username",
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    
+
     password = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
-    
+
     username.label = "Username"
     username.label_classes = ['text-danger']
 
@@ -91,7 +91,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email','profile_picture', 'phone_number', 'residence_region', 'residence_district', 'residence_ward')
+        fields = ('first_name', 'last_name', 'username', 'email','profile_picture', 'phone_number', 'residence_region', 'residence_district')
 
 
 class UserSearchForm(forms.Form):
