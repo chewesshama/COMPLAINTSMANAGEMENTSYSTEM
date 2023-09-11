@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
-from .views import HomeView, UserRegistrationView, IndexView, UserLoginView, userProfileUpdateView, ProfileView, UserRegistrationDoneView, AllUserDisplayView, AllComplaintsDisplayView, DeleteUserView, PasswordChangeCustomView, PasswordChangeDoneView, get_districts
+from .views import HomeView, UserRegistrationView, IndexView, UserLoginView, userProfileUpdateView, ProfileView, UserRegistrationDoneView, AllUserDisplayView, AllComplaintsDisplayView, DeleteUserView, PasswordChangeCustomView, PasswordChangeDoneView
 
 
 app_name = "complaints"
@@ -19,7 +19,7 @@ urlpatterns = [
     path('delete_user/<int:pk>/', DeleteUserView.as_view(), name='delete_user'),
     path('password_change/', PasswordChangeCustomView.as_view(), name='password_change'),
     path('password_change_done/', PasswordChangeDoneView.as_view(), name='password_change_done'),
-    path('get_districts/', get_districts, name='get_districts'),
+#    path('get_districts/', get_districts, name='get_districts'),
 #    path('get_wards/', get_wards, name='get_wards'),
 
 ]

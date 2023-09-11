@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Complaint, Department, Remark, ComplaintAttachments, Region, District
-
+from .models import User, Complaint, Department, Remark, ComplaintAttachments
 
 
 class CustomUserAdmin(UserAdmin):
@@ -19,9 +18,9 @@ admin.site.register(Department)
 admin.site.register(Complaint)
 admin.site.register(Remark)
 admin.site.register(ComplaintAttachments)
-admin.site.register(Region)
-admin.site.register(District)
 
 
-#admin.site.site_header = 'CMS admin area'
-#admin.site.site_title = ''
+admin.site.site_header = 'CMS admin area'
+admin.site.site_title = 'CMS admin site'
+
+

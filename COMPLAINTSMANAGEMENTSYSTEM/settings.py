@@ -125,7 +125,6 @@ AUTH_GROUP_MODEL = "complaints.UserType"
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 #EMAIL_HOST = "smtp.gmail.com"
 #EMAIL_PORT = 587
@@ -140,7 +139,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTHENTICATION_BACKENDS = [
-    'complaints.custom_auth_backend.CustomEmailBackend',
     "django.contrib.auth.backends.ModelBackend",
 ]
 

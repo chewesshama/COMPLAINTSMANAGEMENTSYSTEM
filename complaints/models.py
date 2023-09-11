@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
-from mtaa import tanzania
+#from mtaa import tanzania
 
 
 
@@ -25,18 +25,17 @@ STATUS_CHOICES = (
         ('Closed', 'Closed'),
     )
 
-class Region(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class District(models.Model):
-    name = models.CharField(max_length=100)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
+#class Region(models.Model):
+#    name = models.CharField(max_length=100)
+#
+#    def __str__(self):
+#        return self.name
+#
+#class District(models.Model):
+#    name = models.CharField(max_length=100)
+#
+#    def __str__(self):
+#        return self.name
 
 #class Ward(models.Model):
 #    name = models.CharField(max_length=100)
@@ -50,9 +49,10 @@ class User(AbstractUser):
     departments = models.ManyToManyField(Department)
     profile_picture = models.ImageField(upload_to='profile_pictures/', default='default_pic.jpg', blank=True, null=True)
     phone_number = models.CharField(max_length=15)
-    residence_region = models.CharField(max_length=100, blank=True, null=True)
-    residence_district = models.CharField(max_length=100, blank=True, null=True)
-#    residence_ward = models.CharField(max_length=100, blank=True, null=True)
+#    location = models.ForeignKey(tanzania, on_delete=models.SET_NULL, null=True)
+#    residence_region = models.CharField(max_length=100, blank=True, null=True)
+#    residence_district = models.CharField(max_length=100, blank=True, null=True)
+#     residence_ward = models.CharField(max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)

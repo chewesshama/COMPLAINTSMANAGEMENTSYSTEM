@@ -11,21 +11,21 @@ from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm
 from .models import Complaint, User
-from django.http import JsonResponse
-from mtaa import tanzania
+#from django.http import JsonResponse
+#from mtaa import tanzania
 
 
-def get_districts(request):
-    region_name = request.GET.get('region_name')
-    
-    if hasattr(tanzania, region_name):
-        region = getattr(tanzania, region_name)
-        if hasattr(region, 'districts'):
-            districts = region.districts
-            district_names = [district for district in districts]
-            return JsonResponse(district_names, safe=False)
 
-    return JsonResponse([], safe=False)
+#def get_districts(request):
+#    region_name = request.GET.get('region_name')
+#
+#    if hasattr(tanzania, region_name):
+#        if hasattr(region, 'districts'):
+#            districts = region.districts
+#            district_names = [district for district in districts]
+#            return JsonResponse(district_names, safe=False)
+#
+#    return JsonResponse([], safe=False)
 
 
 #def get_wards(request):
@@ -82,7 +82,7 @@ class UserRegistrationView(PermissionRequiredMixin ,CreateView):
         user = form.save(commit=False)
 
         user_groups = self.request.user.groups.all()
-        
+
         if user_groups.exists():
             user_group = user_groups[0] 
 
@@ -116,7 +116,6 @@ class ProfileView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'complaints/profile.html'
     context_object_name = 'user'
-
 
     def get_object(self, queryset=None):
         return self.request.user
