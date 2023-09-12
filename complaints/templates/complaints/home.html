@@ -8,7 +8,7 @@
 {% block content %}
   <section id="hero">
     <div class="hero-container">
-      <a href="#" class="btn-get-started scrollto">Add Complaint Here</a>
+      <a href="{% url 'complaints:add_complaint' %}" class="btn-get-started scrollto">Add Complaint Here</a>
     </div>
   </section>
 {% endblock content %}

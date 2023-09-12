@@ -9,7 +9,7 @@ from django.db.models import IntegerField
 from django.db.models import Case, When, Value, CharField
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
-from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm
+from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm, AddComplaintForm
 from .models import Complaint, User
 
 
@@ -208,3 +208,19 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
     context_object_name = 'complaints'
 
 
+class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
+    permission_required = 'complaints.view_user'
+    model = Complaint
+    template_name = 'complaints/complaint_details.html'
+    context_object_name = 'complaints'
+
+
+class AddComplaintView(PermissionRequiredMixin, CreateView):
+    permission_required = 'complaints.add_complaint'
+    model = Complaint
+    form_class = AddComplaintForm
+    template_name = 'complaints/add_complaint_form.html'
+    success_url = reverse_lazy('complaints:home')
+    
+    
+    

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
-from .models import User, Department
+from .models import User, Department, Complaint
 from django.contrib.auth.models import Group
 from mtaa import tanzania
 
@@ -116,6 +116,54 @@ class PasswordChangeCustomForm(PasswordChangeForm):
         fields = ['old_password', 'new_password1', 'new_password2']
 
 
+class AddComplaintForm(forms.ModelForm):
+    title = forms.CharField(
+        label="title",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    complainant = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    description = forms.CharField(
+        label="description",
+        widget=forms.Textarea(attrs={'class': 'form-control'})
+    )
+    
+    attachments = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
 
+    targeted_personnel = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    targeted_department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        required=True,
+        label="Department",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    STATUS_CHOICES = (
+        ('Opened', 'Opened'),
+        ('Forwarded', 'Forwarded'),
+        ('Closed', 'Closed'),
+    )
+
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        label="status",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    class Meta:
+        model = Complaint
+        fields = ['title','complainant', 'description', 'attachments', 'targeted_department', 'targeted_personnel', 'status']
 
 

@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    <div class="conent-section container py-3">
+    <div class="conent-section container py-5">
         <div class="media">
             {% if user.profile_picture %}
                 <img src="{{ user.profile_picture.url }}" class="rounded-circle account-img"" style="height: 100px; width: 100px;" alt="{{ user_profile.user.username }}'s Profile Image">
@@ -18,12 +18,40 @@
             {% endif %}
             <div class="media-body">
                 <h2 class="account-heading my-2"> {{user.first_name|upper}} {{user.last_name|upper}}</h2>
-                <p class="text-secondary">Username: {{ user.username }} </p>
-                <p class="text-secondary">Email: {{ user.email }}</p>
-                <p class="text-secondary">Residence Address: {{user.residence_address}}</p>
-                <p class="text-secondary">Phone Number: {{user.phone_number}}</p>
+                <table class="table my-4">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Username: </th>
+                            <td>{{ user.username|upper }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email: </th>
+                            {% if user.email %}
+                              <td>{{ user.email|capfirst }}</td>
+                            {% else %}
+                                <td>-- Not Set --</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <th scope="row">Residence Address: </th>
+                            {% if user.location %}
+                              <td>{{user.location|capfirst}}</td>
+                            {% else %}
+                                <td>-- Not Set --</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Number: </th>
+                            {% if user.phone_number %}
+                              <td>{{user.phone_number}}</td>
+                            {% else %}
+                                <td>-- Not Set --</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="row">
+            <div class="row mt-5 justify-content-between">
                 <div class="col-md-2">
                     <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:profile_update' user.pk %}" class="nav-link text-light">Profile Update</a></button>
                 </div>

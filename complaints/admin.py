@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Complaint, Department, Remark, ComplaintAttachments
 
-
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         ("User details", {
@@ -19,6 +18,12 @@ class CustomUserAdmin(UserAdmin):
                 "location",
             ],
         }),
+        (
+            "Groups", {
+                "fields": [
+                    "groups",
+                    ]
+                }),
     )
 
 
