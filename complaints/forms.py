@@ -7,6 +7,26 @@ from mtaa import tanzania
 
 
 class CEORegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        label="firstname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    last_name = forms.CharField(
+        label="lastname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    username = forms.CharField(
+        label="username",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    email = forms.EmailField(
+        label="email",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    
     password1 = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
@@ -37,6 +57,26 @@ class CEORegistrationForm(UserCreationForm):
 
 
 class HODRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        label="firstname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    last_name = forms.CharField(
+        label="lastname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    username = forms.CharField(
+        label="username",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    email = forms.EmailField(
+        label="email",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+
     password1 = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
@@ -69,10 +109,39 @@ class LoginForm(AuthenticationForm):
 class UserProfileForm(forms.ModelForm):
     REGION_CHOICES = [(region, region) for region in tanzania]
 
+    first_name = forms.CharField(
+        label="firstname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    last_name = forms.CharField(
+        label="lastname",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    username = forms.CharField(
+        label="username",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    email = forms.EmailField(
+        label="email",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+
+    profile_picture = forms.ImageField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+
     location = forms.ChoiceField(
         choices=REGION_CHOICES,
         label="location",
         widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    
+    phone_number = forms.CharField(
+        label = "phone number",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
 #    def __init__(self, *args, **kwargs):
@@ -121,12 +190,7 @@ class AddComplaintForm(forms.ModelForm):
         label="title",
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    complainant = forms.ModelChoiceField(
-        queryset=User.objects.all(),
-        required=True,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    
+
     description = forms.CharField(
         label="description",
         widget=forms.Textarea(attrs={'class': 'form-control'})
@@ -164,6 +228,6 @@ class AddComplaintForm(forms.ModelForm):
 
     class Meta:
         model = Complaint
-        fields = ['title','complainant', 'description', 'attachments', 'targeted_department', 'targeted_personnel', 'status']
+        fields = ['title', 'description', 'attachments', 'targeted_department', 'targeted_personnel', 'status']
 
 

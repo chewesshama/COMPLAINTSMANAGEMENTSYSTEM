@@ -54,7 +54,7 @@ class Complaint(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.title},  by  {self.status}'
+        return f'{self.title},  by  {self.complainant}'
 
 
 class Remark(models.Model):

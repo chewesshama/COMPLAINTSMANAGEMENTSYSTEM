@@ -1,3 +1,5 @@
+from pickle import OBJ
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, DeleteView
 from django.contrib import messages
@@ -10,7 +12,7 @@ from django.db.models import Case, When, Value, CharField
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm, AddComplaintForm
-from .models import Complaint, User
+from .models import Complaint, User, ComplaintAttachments
 
 
 
@@ -207,6 +209,31 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
     template_name = 'complaints/all_complaints.html'
     context_object_name = 'complaints'
 
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.groups.filter(name='CEO').exists() or user.is_superuser:
+            queryset = Complaint.objects.all()
+        elif user.groups.filter(name='HOD').exists():
+            department = user.departments.first()
+            if department:
+                queryset = Complaint.objects.filter(targeted_department=department)
+            else:
+                queryset = Complaint.objects.none()
+        else:
+            queryset = Complaint.objects.none()
+
+        return queryset
+
+
+class UserComplaintsDisplayView(LoginRequiredMixin ,ListView):
+    model = Complaint
+    template_name = 'complaints/my_complaints.html'
+    context_object_name = 'complaints'
+    
+    def get_queryset(self):
+        return Complaint.objects.filter(complainant=self.request.user).order_by('-date_added')
+
 
 class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
     permission_required = 'complaints.view_user'
@@ -215,12 +242,43 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
     context_object_name = 'complaints'
 
 
-class AddComplaintView(PermissionRequiredMixin, CreateView):
-    permission_required = 'complaints.add_complaint'
-    model = Complaint
-    form_class = AddComplaintForm
-    template_name = 'complaints/add_complaint_form.html'
-    success_url = reverse_lazy('complaints:home')
-    
-    
-    
+@login_required
+def add_complaint(request):
+    if request.method == 'POST':
+        form = AddComplaintForm(request.POST, request.FILES)
+        if form.is_valid():
+            complaint = form.save(commit=False)
+
+            complaint = Complaint(
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data['description'],
+                complainant=request.user,
+                targeted_department=form.cleaned_data['targeted_department'],
+                targeted_personnel=form.cleaned_data['targeted_personnel'],
+                status=form.cleaned_data['status'],
+            )
+            attachments = []
+            picture = request.FILES.get('picture')
+            video = request.FILES.get('video')
+            voice = request.FILES.get('voice')
+            file = request.FILES.get('file')
+            
+            if picture:
+                attachments.append(ComplaintAttachments(picture=picture))
+            if video:
+                attachments.append(ComplaintAttachments(video=video))
+            if voice:
+                attachments.append(ComplaintAttachments(voice=voice))
+            if file:
+                attachments.append(ComplaintAttachments(file=file))
+
+            complaint.save()
+
+            complaint.attachments.set(attachments)
+
+            return redirect('complaints:user_complaints_display')
+    else:
+        form = AddComplaintForm()
+
+    context = {'form': form}
+    return render(request, 'complaints/add_complaint_form.html', context)

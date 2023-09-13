@@ -53,7 +53,6 @@
                 {% if user|has_group:'CEO' or user.is_superuser %}
 
                   <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="#MyComplaints">My complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:all_complaints_display' %}">All complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:all_users_display' %}">All Employees</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:register' %}">Register</a></li>
@@ -64,18 +63,16 @@
                 {% elif user|has_group:'HOD' %}
 
                   <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="#MyComplaints">My complaints</a></li>
-                  <li><a class="nav-link scrollto" href="#">Department Complaints</a></li>
+                  <li><a class="nav-link scrollto" href="{% url 'complaints:all_complaints_display' %}">Department Complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:all_users_display' %}">Department Employees</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:register' %}">Register</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'admin:index' %}">Admin Panel</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>
 
                 {% else %}
                 
                   <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="#myComplaints">My Complaints</a></li>
+                  <li><a class="nav-link scrollto" href="{% url 'complaints:user_complaints_display' %}">My Complaints</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
                   <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>
 
