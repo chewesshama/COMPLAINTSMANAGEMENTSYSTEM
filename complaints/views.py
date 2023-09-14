@@ -1,4 +1,3 @@
-from pickle import OBJ
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, DeleteView
@@ -14,6 +13,18 @@ from django.urls import reverse, reverse_lazy
 from .forms import UserProfileForm, CEORegistrationForm, HODRegistrationForm, LoginForm, UserSearchForm, PasswordChangeCustomForm, AddComplaintForm
 from .models import Complaint, User, ComplaintAttachments
 
+
+
+def custom_404_view(request, exception=None):
+    return render(request, 'error_templates/404.html', status=404)
+
+
+def custom_403_view(request, exception=None):
+    return render(request, 'error_templates/403.html', status=403)
+
+
+def custom_500_view(request, exception=None):
+    return render(request, 'error_templates/500.html', status=500)
 
 
 def add_user_to_group(user, group_name):
@@ -127,8 +138,6 @@ def userProfileUpdateView(request, pk):
             return redirect(profile_url)
     else:
         form = UserProfileForm(instance=request.user)
-        
-    
 
     context = {
         'form': form,

@@ -48,12 +48,20 @@
                                 <td>-- Not Set --</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>
+
+                            </td>
+                            <td>
+                                
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <div class="row mt-5 justify-content-between">
                 <div class="col-md-2">
-                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:profile_update' user.pk %}" class="nav-link text-light">Profile Update</a></button>
+                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:profile_update' user.pk %}" class="nav-link text-light">Update</a></button>
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:password_change' %}" class="nav-link text-light">Change Password</a></button>

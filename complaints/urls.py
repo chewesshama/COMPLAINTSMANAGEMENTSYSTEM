@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
-from .views import HomeView, UserRegistrationView, IndexView, UserLoginView, userProfileUpdateView, ProfileView, UserRegistrationDoneView, AllUserDisplayView, AllComplaintsDisplayView, DeleteUserView, PasswordChangeCustomView, PasswordChangeDoneView, add_complaint, UserComplaintsDisplayView
+from .views import HomeView, UserRegistrationView, IndexView, UserLoginView, userProfileUpdateView, ProfileView, UserRegistrationDoneView, AllUserDisplayView, AllComplaintsDisplayView, DeleteUserView, PasswordChangeCustomView, PasswordChangeDoneView, add_complaint, UserComplaintsDisplayView, custom_404_view, custom_403_view
 
 
 app_name = "complaints"
@@ -21,6 +21,12 @@ urlpatterns = [
     path('password_change/', PasswordChangeCustomView.as_view(), name='password_change'),
     path('password_change_done/', PasswordChangeDoneView.as_view(), name='password_change_done'),
     path('add_complaint/', add_complaint, name='add_complaint'),
+    
 
+
+
+    re_path(r'^.*$', custom_404_view),
 ]
 
+handler403 = custom_403_view
+handler404 = custom_404_view
