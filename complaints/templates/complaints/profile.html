@@ -1,76 +1,77 @@
-{% extends "complaints/base.html" %}
-{% load static %}
+{% extends "complaints/base.html" %} 
+{% load static %} 
 
-{% block title %}
-
-    Profile Page For CMS User
-  
-{% endblock title %}
+{% block title %} 
+Profile Page For CMS User 
+{% endblock title %} 
 
 {% block content %}
 
-    <div class="conent-section container py-5">
-        <div class="media">
-            {% if user.profile_picture %}
-                <img src="{{ user.profile_picture.url }}" class="rounded-circle account-img"" style="height: 100px; width: 100px;" alt="{{ user_profile.user.username }}'s Profile Image">
+<div class="conent-section container py-5">
+  <div class="media">
+    {% if user.profile_picture %} <img src="{{ user.profile_picture.url }}"
+    class="rounded-circle account-img"" style="height: 100px; width: 100px;"
+    alt="{{ user.username }}'s Profile Image"> {% else %} <img src="{% static
+    'default_pic.png' %}" class="rounded-circle account-img"" style="height:
+    100px; width: 100px;" alt="Default Profile Image"> {% endif %}
+    <div class="media-body">
+      <h2 class="account-heading my-2">
+        {{user.first_name|upper}} {{user.last_name|upper}}
+      </h2>
+      <table class="table my-4">
+        <tbody>
+          <tr>
+            <th scope="row">Username:</th>
+            <td>{{ user.username|upper }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Email:</th>
+            {% if user.email %}
+            <td>{{ user.email|capfirst }}</td>
             {% else %}
-                <img src="{% static 'default_pic.png' %}" class="rounded-circle account-img"" style="height: 100px; width: 100px;" alt="Default Profile Image">
+            <td>-- Not Set --</td>
             {% endif %}
-            <div class="media-body">
-                <h2 class="account-heading my-2"> {{user.first_name|upper}} {{user.last_name|upper}}</h2>
-                <table class="table my-4">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Username: </th>
-                            <td>{{ user.username|upper }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Email: </th>
-                            {% if user.email %}
-                              <td>{{ user.email|capfirst }}</td>
-                            {% else %}
-                                <td>-- Not Set --</td>
-                            {% endif %}
-                        </tr>
-                        <tr>
-                            <th scope="row">Residence Address: </th>
-                            {% if user.location %}
-                              <td>{{user.location|capfirst}}</td>
-                            {% else %}
-                                <td>-- Not Set --</td>
-                            {% endif %}
-                        </tr>
-                        <tr>
-                            <th scope="row">Phone Number: </th>
-                            {% if user.phone_number %}
-                              <td>{{user.phone_number}}</td>
-                            {% else %}
-                                <td>-- Not Set --</td>
-                            {% endif %}
-                        </tr>
-                        <tr>
-                            <td>
-
-                            </td>
-                            <td>
-                                
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="row mt-5 justify-content-between">
-                <div class="col-md-2">
-                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:profile_update' user.pk %}" class="nav-link text-light">Update</a></button>
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-dark text-light btn-sm"><a href="{% url 'complaints:password_change' %}" class="nav-link text-light">Change Password</a></button>
-                </div>
-            </div>
-        </div>
+          </tr>
+          <tr>
+            <th scope="row">Residence Address:</th>
+            {% if user.location %}
+            <td>{{user.location|capfirst}}</td>
+            {% else %}
+            <td>-- Not Set --</td>
+            {% endif %}
+          </tr>
+          <tr>
+            <th scope="row">Phone Number:</th>
+            {% if user.phone_number %}
+            <td>{{user.phone_number}}</td>
+            {% else %}
+            <td>-- Not Set --</td>
+            {% endif %}
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <div class="row mt-5 justify-content-between">
+      <div class="col-md-2">
+        <button class="btn btn-dark text-light btn-sm">
+          <a
+            href="{% url 'complaints:profile_update' user.pk %}"
+            class="nav-link text-light"
+            >Update</a
+          >
+        </button>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-dark text-light btn-sm">
+          <a
+            href="{% url 'complaints:password_change' %}"
+            class="nav-link text-light"
+            >Change Password</a
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  
 {% endblock content %}
-
-

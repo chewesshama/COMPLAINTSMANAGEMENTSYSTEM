@@ -1,188 +1,169 @@
-{% extends "complaints/base.html" %}
-{% load static %}
-
+{% extends "complaints/base.html" %} 
+{% load static %} 
 
 {% block title %}
-    Complaints management System
-{% endblock title %}
+Complaints management System 
+{% endblock title %} 
 
 {% block style %}
-	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="{% static 'assets/css/login.css' %}">
-	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-{% endblock style %}
+<link
+  href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<link rel="stylesheet" href="{% static 'assets/css/login.css' %}" />
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+{% endblock style %} {% block content %}
 
-{% block content %}
- 
-		<section class="ftco-section">
-			<div class="container">
-				<div class="row justify-content-center">
-					<div class="col-md-7 col-lg-5">
-						<div class="login-wrap p-4 p-md-5">
-							<h3 class="mb-4">Update Profile</h3>
-							<form method="post" class="signup-form my-5" enctype="multipart/form-data">
-								{% csrf_token %}
-                                {{ form.non_field_errors }}
-								<div class="form-group">
+<section class="ftco-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-5">
+        <div class="login-wrap p-4 p-md-5">
+          <h3 class="mb-4">Update Profile</h3>
+          <form
+            method="post"
+            class="signup-form my-5"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %} {{ form.non_field_errors }}
+            <div class="form-group">
+              {% if form.first_name.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.first_name.errors }}
+              </div>
+              {% endif %} {{form.first_name.label_tag}} {{ form.first_name }}
+            </div>
 
-									{% if form.first_name.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.first_name.errors }}
-										</div>
-									{% endif %}
-									{{form.first_name.label_tag}}
-									{{ form.first_name }}
+            <div class="form-group">
+              {% if form.last_name.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.last_name.errors }}
+              </div>
+              {% endif %} {{form.last_name.label_tag}} {{ form.last_name }}
+            </div>
 
-								</div>
+            <div class="form-group">
+              {% if form.username.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.username.errors }}
+              </div>
+              {% endif %} {{form.username.label_tag}} {{ form.username }}
+            </div>
+            <div class="form-group">
+              {% if form.email.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.email.errors }}
+              </div>
+              {% endif %} {{form.email.label_tag}} {{ form.email }}
+            </div>
+            <div class="form-group">
+              {% if form.profile_picture.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.profile_picture.errors }}
+              </div>
+              {% endif %} {{form.profile_picture.label_tag}} {{
+              form.profile_picture }}
+            </div>
+            <div class="form-group">
+              {% if form.phone_number.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.phone_number.errors }}
+              </div>
+              {% endif %} {{form.phone_number.label_tag}} {{ form.phone_number
+              }}
+            </div>
+            <div class="form-group">
+              {% if form.location.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.location.errors }}
+              </div>
+              {% endif %} {{form.location.label_tag}} {{ form.location }}
+            </div>
+            <div class="form-group d-flex justify-content-end">
+              <abbr title="submit">
+                <button type="submit" class="btn btn-primary submit">
+                  <span class="fa fa-check"></span>
+                </button>
+              </abbr>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-								<div class="form-group">
+<div class="container py-3">
+  {% endblock content %} {% block js %}
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/popper.js' %}"></script>
+  <script src="{% static 'js/bootstrap.js' %}"></script>
+  <script src="{% static 'assets/js/login.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      var regionSelect = $("#{{ form.residence_region.id_for_label }}");
+      var districtSelect = $("#{{ form.residence_district.id_for_label }}");
+      var wardSelect = $("#{{ form.residence_ward.id_for_label }}");
 
-									{% if form.last_name.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.last_name.errors }}
-										</div>
-									{% endif %}
-									{{form.last_name.label_tag}}
-									{{ form.last_name }}
+      districtSelect.hide();
+      wardSelect.hide();
 
-								</div>
+      regionSelect.on("change", function () {
+        var selectedRegion = $(this).val();
+        if (selectedRegion) {
+          districtSelect.show();
+          wardSelect.hide();
 
-								<div class="form-group">
+          $.ajax({
+            url: "/get_districts/?region_name=" + selectedRegion,
+            success: function (data) {
+              districtSelect.empty();
 
-									{% if form.username.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.username.errors }}
-										</div>
-									{% endif %}
-									{{form.username.label_tag}}
-									{{ form.username }}
+              data.forEach(function (district) {
+                districtSelect.append(
+                  $("<option>", {
+                    value: district,
+                    text: district,
+                  })
+                );
+              });
+            },
+          });
+        } else {
+          districtSelect.hide();
+          wardSelect.hide();
+        }
+      });
 
-								</div>
-								<div class="form-group">
+      //			districtSelect.on('change', function () {
+      //				var selectedDistrict = $(this).val();
+      //				if (selectedDistrict) {
+      //					wardSelect.show();
+      //					$.ajax({
+      //						url: '/get_wards/?district_name=' + selectedDistrict,
+      //						success: function (data) {
+      //							wardSelect.empty();
+      //
+      //							data.forEach(function (ward) {
+      //								wardSelect.append($('<option>', {
+      //									value: ward,
+      //									text: ward
+      //								}));
+      //							});
+      //
+      //						}
+      //					});
+      //				} else {
+      //					wardSelect.hide();
+      //				}
+      //			});
+    });
+  </script>
 
-									{% if form.email.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.email.errors }}
-										</div>
-									{% endif %}
-									{{form.email.label_tag}}
-									{{ form.email }}
-
-								</div>
-								<div class="form-group">
-
-									{% if form.profile_picture.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.profile_picture.errors }}
-										</div>
-									{% endif %}
-									{{form.profile_picture.label_tag}}
-									{{ form.profile_picture }}
-
-                                </div>
-								<div class="form-group">
-
-									{% if form.phone_number.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.phone_number.errors }}
-										</div>
-									{% endif %}
-									{{form.phone_number.label_tag}}
-									{{ form.phone_number }}
-
-								</div>
-								<div class="form-group">
-
-									{% if form.location.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ form.location.errors }}
-										</div>
-									{% endif %}
-									{{form.location.label_tag}}
-									{{ form.location }}
-
-								</div>
-								<div class="form-group d-flex justify-content-end"><abbr title="submit">
-									<button type="submit" class="btn btn-primary submit"><span class="fa fa-check"></span></button>
-									</abbr>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-    <div class="container py-3">
-
-{% endblock content %}
-
-{% block js %}
-	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
-	<script src="{% static 'assets/js/popper.js' %}"></script>
-	<script src="{% static 'js/bootstrap.js' %}"></script>
-	<script src="{% static 'assets/js/login.js' %}"></script>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script>
-		$(document).ready(function () {
-			var regionSelect = $('#{{ form.residence_region.id_for_label }}');
-			var districtSelect = $('#{{ form.residence_district.id_for_label }}');
-			var wardSelect = $('#{{ form.residence_ward.id_for_label }}');
-
-			districtSelect.hide();
-			wardSelect.hide();
-
-			regionSelect.on('change', function () {
-				var selectedRegion = $(this).val();
-				if (selectedRegion) {
-					districtSelect.show();
-					wardSelect.hide();
-
-					$.ajax({
-						url: '/get_districts/?region_name=' + selectedRegion,
-						success: function (data) {
-							districtSelect.empty();
-
-							data.forEach(function (district) {
-								districtSelect.append($('<option>', {
-									value: district,
-									text: district
-								}));
-							});
-
-						}
-					});
-				} else {
-					districtSelect.hide();
-					wardSelect.hide();
-				}
-			});
-
-//			districtSelect.on('change', function () {
-//				var selectedDistrict = $(this).val();
-//				if (selectedDistrict) {
-//					wardSelect.show();
-//					$.ajax({
-//						url: '/get_wards/?district_name=' + selectedDistrict,
-//						success: function (data) {
-//							wardSelect.empty();
-//
-//							data.forEach(function (ward) {
-//								wardSelect.append($('<option>', {
-//									value: ward,
-//									text: ward
-//								}));
-//							});
-//
-//						}
-//					});
-//				} else {
-//					wardSelect.hide();
-//				}
-//			});
-		});
-	</script>
-
-{% endblock js %}
-
+  {% endblock js %}
+</div>

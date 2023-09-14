@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,7 +49,7 @@ ROOT_URLCONF = "COMPLAINTSMANAGEMENTSYSTEM.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'complaints', "templates")],
+        "DIRS": [os.path.join(BASE_DIR, "complaints", "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -71,9 +71,9 @@ WSGI_APPLICATION = "COMPLAINTSMANAGEMENTSYSTEM.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get('DB_NAME'),
-        "USER": os.environ.get('DB_USER'),
-        "PASSWORD": os.environ.get('DB_PASS'),
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASS"),
         "HOST": "localhost",
         "PORT": "3306",
     }
@@ -125,12 +125,12 @@ AUTH_GROUP_MODEL = "complaints.UserType"
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-#EMAIL_HOST = "smtp.gmail.com"
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-#EMAIL_HOST_USER = os.environ.get("shamachewes99@gmail.com")
-#EMAIL_HOST_PASSWORD = os.environ.get("")
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.environ.get("shamachewes99@gmail.com")
+# EMAIL_HOST_PASSWORD = os.environ.get("")
 
 
 # Default primary key field type
@@ -149,5 +149,3 @@ LOGIN_REDIRECT_URL = "complaints:home"
 LOGIN_URL = "complaints:login"
 
 LOGOUT_REDIRECT_URL = "complaints:login"
-
-

@@ -1,110 +1,229 @@
-{% load static %}
-{% load custom_tag %}
-
+{% load static %} {% load custom_tag %}
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="complaint management system" name="keywords">
-        <meta name="description" content="system that's used by organizations to take their empleyees complaints and take action based on the guven complaint">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>
-          {% block title %}
-          COMPLAINTS MANAGEMENT STSTEM
-          {% endblock title %}
-          </title>
-          
-          {% block style %}
-            
-          {% endblock style %}
-          <link href="{% static 'assets/img/ictpack.png' %}" rel="icon">
-          <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="complaint management system" name="keywords" />
+    <meta
+      name="description"
+      content="system that's used by organizations to take their empleyees complaints and take action based on the guven complaint"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      {% block title %} COMPLAINTS MANAGEMENT STSTEM {% endblock title %}
+    </title>
 
-          <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    {% block style %} {% endblock style %}
+    <link href="{% static 'assets/img/ictpack.png' %}" rel="icon" />
+    <link
+      href="{% static 'assets/img/apple-touch-icon.png' %}"
+      rel="apple-touch-icon"
+    />
 
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
 
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-          <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-          <link href= "{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
-          <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
-          <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
-	        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-          <link href="{% static 'assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
-          <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
-          <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
-          <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+    <link
+      href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}"
+      rel="stylesheet"
+    />
+    <link
+      href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}"
+      rel="stylesheet"
+    />
+    <link
+      href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="{% static 'assets/vendor/remixicon/remixicon.css' %}"
+      rel="stylesheet"
+    />
+    <link
+      href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}"
+      rel="stylesheet"
+    />
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    {% if request.path == '/' %} {% elif user.is_authenticated %}
+    <!-- ======= Header ======= -->
+    <header id="header" class="d-flex align-items-center">
+      <div
+        class="container-fluid d-flex align-items-center justify-content-lg-between"
+      >
+        <h1 class="logo me-auto me-lg-0">
+          <a href="{% url 'complaints:home' %}">CMS</a>
+        </h1>
 
-    </head>
-    <body>
-      {% if request.path == '/' %}
-        
-      {% elif user.is_authenticated %}
-        <!-- ======= Header ======= -->
-        <header id="header" class="d-flex align-items-center ">
-          <div class="container-fluid d-flex align-items-center justify-content-lg-between">
+        <nav id="navbar" class="navbar order-last order-lg-0">
+          <ul>
+            {% if user|has_group:'CEO' or user.is_superuser %}
 
-            <h1 class="logo me-auto me-lg-0"><a href="{% url 'complaints:home' %}">CMS</a></h1>
+            <li>
+              <a
+                class="nav-link scrollto active"
+                href="{% url 'complaints:home' %}"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:all_complaints_display' %}"
+                >All complaints</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:all_users_display' %}"
+                >All Employees</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:register' %}"
+                >Register</a
+              >
+            </li>
+            <li>
+              <a class="nav-link scrollto" href="{% url 'admin:index' %}"
+                >Admin Panel</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:profile' user.pk %}"
+                >My Profile</a
+              >
+            </li>
+            <li>
+              <a class="nav-link scrollto" href="{% url 'complaints:logout' %}"
+                >Logout</a
+              >
+            </li>
 
-            <nav id="navbar" class="navbar order-last order-lg-0">
-              <ul>
+            {% elif user|has_group:'HOD' %}
 
-                {% if user|has_group:'CEO' or user.is_superuser %}
+            <li>
+              <a
+                class="nav-link scrollto active"
+                href="{% url 'complaints:home' %}"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:all_complaints_display' %}"
+                >Department Complaints</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:all_users_display' %}"
+                >Department Employees</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:register' %}"
+                >Register</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:profile' user.pk %}"
+                >My Profile</a
+              >
+            </li>
+            <li>
+              <a class="nav-link scrollto" href="{% url 'complaints:logout' %}"
+                >Logout</a
+              >
+            </li>
 
-                  <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:all_complaints_display' %}">All complaints</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:all_users_display' %}">All Employees</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:register' %}">Register</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'admin:index' %}">Admin Panel</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>
+            {% else %}
 
-                {% elif user|has_group:'HOD' %}
+            <li>
+              <a
+                class="nav-link scrollto active"
+                href="{% url 'complaints:home' %}"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:user_complaints_display' %}"
+                >My Complaints</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link scrollto"
+                href="{% url 'complaints:profile' user.pk %}"
+                >My Profile</a
+              >
+            </li>
+            <li>
+              <a class="nav-link scrollto" href="{% url 'complaints:logout' %}"
+                >Logout</a
+              >
+            </li>
 
-                  <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:all_complaints_display' %}">Department Complaints</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:all_users_display' %}">Department Employees</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:register' %}">Register</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>
+            {% endif %}
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav>
+        <!-- .navbar -->
+      </div>
+    </header>
+    <!-- End Header -->
+    {% endif %}
 
-                {% else %}
-                
-                  <li><a class="nav-link scrollto active" href="{% url 'complaints:home' %}">Home</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:user_complaints_display' %}">My Complaints</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:profile' user.pk %}">My Profile</a></li>
-                  <li><a class="nav-link scrollto" href="{% url 'complaints:logout' %}">Logout</a></li>
+    <!--block for contents-->
+    <div>{% block content %} {% endblock content %}</div>
+    <!--endblock for contents-->
 
-                {% endif %}
+    <!-- Vendor JS Files -->
+    {% block js %} {% endblock js %}
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+    <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
 
-              </ul>
-              <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-          </div>
-        </header><!-- End Header -->
-      {% endif %}
-
-          <!--block for contents-->
-          <div>
-            {% block content %}
-            {% endblock content %}
-          </div>
-          <!--endblock for contents-->
-
-        <!-- Vendor JS Files -->
-        {% block js %}
-          
-        {% endblock js %}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-        <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
-        <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
-        <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
-        <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
-
-        <script src="{% static 'js/bootstrap.js' %}" async defer></script>
-        <script src="{% static 'assets/js/main.js' %}"></script>
-    </body>
+    <script src="{% static 'js/bootstrap.js' %}" async defer></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+  </body>
 </html>
-
-

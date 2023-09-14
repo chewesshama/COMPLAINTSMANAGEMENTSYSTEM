@@ -1,16 +1,19 @@
-{% extends "error_templates/base_error.html" %}
+{% extends "error_templates/base_error.html" %} 
 
-
-{% block title %}
-  CMS 500 server error
-{% endblock title %}
+{% block title %} 
+CMS 500 server error 
+{% endblock title %} 
 
 {% block error-content %}
-  			<div class="notfound-404">
-				<h1>5<span></span>0</h1>
-			</div>
-			<h2>Oops! Server Error</h2>
-			<p>Sorry but the Error Occured in Our server, Try Again Later.</p>
-            <a id="goBackButton" style="background-color: #e32249 !important; cursor: pointer; color: white;">Go Back</a>
+<div class="notfound-404">
+  <h1>5<span></span>0</h1>
+</div>
+<h2>Oops! Server Error</h2>
+<p>Sorry but the Error Occured in Our server, Try Again Later.</p>
+<a
+  id="goBackButton"
+  style="background-color: #e32249 !important; cursor: pointer; color: white"
+  >Go Back</a
+>
 
 {% endblock error-content %}

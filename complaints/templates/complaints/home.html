@@ -1,16 +1,18 @@
-{% extends "complaints/base.html" %}
-{% load static %}
+{% extends "complaints/base.html" %} 
+{% load static %} 
 
 {% block title %}
-  Complaints management System
-{% endblock title %}
+Complaints management System 
+{% endblock title %} 
 
 {% block content %}
-  <section id="hero">
-    <div class="hero-container">
-      <a href="{% url 'complaints:add_complaint' %}" class="btn-get-started scrollto">Add Complaint Here</a>
-    </div>
-  </section>
+<section id="hero">
+  <div class="hero-container">
+    <a
+      href="{% url 'complaints:add_complaint' %}"
+      class="btn-get-started scrollto"
+      >Add Complaint Here</a
+    >
+  </div>
+</section>
 {% endblock content %}
-
-

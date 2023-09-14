@@ -1,17 +1,17 @@
-{% extends "complaints/base.html" %}
+{% extends "complaints/base.html" %} 
 
-{% block title %}
-  Complaints management System
-{% endblock title %}
+{% block title %} 
+Complaints management System 
+{% endblock title %} 
 
 {% block content %}
-  <section id="hero">
-    <div class="hero-container">
-      <h1>Complaints Management System</h1>
-      <h2>Welcome to IctPack Solution LTD</h2>
-      <a href="{% url 'complaints:login' %}" class="btn-get-started scrollto">Login Here</a>
-    </div>
-  </section>
+<section id="hero">
+  <div class="hero-container">
+    <h1>Complaints Management System</h1>
+    <h2>Welcome to IctPack Solution LTD</h2>
+    <a href="{% url 'complaints:login' %}" class="btn-get-started scrollto"
+      >Login Here</a
+    >
+  </div>
+</section>
 {% endblock content %}
-
-
