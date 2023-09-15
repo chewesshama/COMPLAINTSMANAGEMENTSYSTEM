@@ -65,16 +65,18 @@ Complaints management System
               <div class="alert alert-danger" role="alert">
                 {{ form.profile_picture.errors }}
               </div>
-              {% endif %} {{form.profile_picture.label_tag}} {{
-              form.profile_picture }}
+              {% endif %} 
+              {{form.profile_picture.label_tag}} 
+              {{ form.profile_picture }}
             </div>
             <div class="form-group">
               {% if form.phone_number.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.phone_number.errors }}
               </div>
-              {% endif %} {{form.phone_number.label_tag}} {{ form.phone_number
-              }}
+              {% endif %} 
+              {{form.phone_number.label_tag}} 
+              {{ form.phone_number}}
             </div>
             <div class="form-group">
               {% if form.location.errors %}

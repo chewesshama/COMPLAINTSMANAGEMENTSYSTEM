@@ -200,6 +200,12 @@ class PasswordChangeCustomForm(PasswordChangeForm):
         fields = ["old_password", "new_password1", "new_password2"]
 
 
+class MultiFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', forms.ClearableFileInput(attrs={'multiple': True}))
+        super().__init__(*args, **kwargs)
+
+
 class AddComplaintForm(forms.ModelForm):
     title = forms.CharField(
         label="title", widget=forms.TextInput(attrs={"class": "form-control"})
@@ -209,8 +215,9 @@ class AddComplaintForm(forms.ModelForm):
         label="description", widget=forms.Textarea(attrs={"class": "form-control"})
     )
 
-    attachments = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={"class": "form-control"}), required=False
+    attachments = MultiFileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}),
     )
 
     targeted_personnel = forms.ModelChoiceField(

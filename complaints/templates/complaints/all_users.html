@@ -38,61 +38,76 @@
         </thead>
         <tbody>
           {% for user in users %}
-          <form
-            action="{% url 'complaints:delete_user' user.pk %}"
-            method="POST"
-          >
-            {% csrf_token %}
-            <tr>
-              {% if user.first_name and user.last_name %}
-              <td>
-                {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}
-              </td>
-              {% elif user.first_name or user.last_name %} {% if user.first_name
-              %}
-              <td>{{ user.first_name }}</td>
-              {% elif user.last_name %}
-              <td>{{ user.last_name }}</td>
-              {% endif %} {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% if user.username %}
-              <td>{{ user.username|capfirst }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% if user.email %}
-              <td>{{ user.email|capfirst }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% if user.departments.all %} {% for department in
-              user.departments.all %} {% if department.name %}
-              <td>{{ department.name|upper }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% endfor %} {% else %}
-              <td>None</td>
-              {% endif %} {% for group in user.groups.all %} {% if group.name %}
-              <td>{{ group.name }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% endfor %} {% if user.phone_number %}
-              <td>{{ user.phone_number }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %} {% if user.location %}
-              <td>{{ user.location|capfirst }}</td>
-              {% else %}
-              <td>-- Not Set --</td>
-              {% endif %}
+            <form
+              action="{% url 'complaints:delete_user' user.pk %}"
+              method="POST"
+            >
+              {% csrf_token %}
+              <tr>
+                {% if user.first_name and user.last_name %}
+                <td>
+                  {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}
+                </td>
+                {% elif user.first_name or user.last_name %} 
+                  {% if user.first_name%}
+                  <td>{{ user.first_name }}</td>
+                  {% elif user.last_name %}
+                  <td>{{ user.last_name }}</td>
+                  {% endif %} 
+                {% else %}
+                  <td>-- Not Set --</td>
+                {% endif %} 
+                {% if user.username %}
+                  <td>{{ user.username|capfirst }}</td>
+                {% else %}
+                <td>-- Not Set --</td>
+                {% endif %} {% if user.email %}
+                <td>{{ user.email|capfirst }}</td>
+                {% else %}
+                <td>-- Not Set --</td>
+                {% endif %} 
 
-              <td>
-                {% if user.username != request.user.username %}
-                <button type="submit" class="btn btn-danger m-1 btn-sm">
-                  DELETE
-                </button>
+                {% if user.departments.all %} 
+                  {% for department in user.departments.all %} 
+                    {% if department.name %}
+                      <td>{{ department.name|upper }}</td>
+                    {% else %}
+                      <td>-- Not Set --</td>
+                    {% endif %} 
+                  {% endfor %} 
+                {% else %}
+                  <td>None</td>
+                {% endif %} 
+                
+                {% for group in user.groups.all %} 
+                  {% if group.name %}
+                    <td>{{ group.name }}</td>
+                  {% else %}
+                    <td>-- Not Set --</td>
+                  {% endif %} 
+                {% endfor %} 
+
+                {% if user.phone_number %}
+                  <td>{{ user.phone_number }}</td>
+                {% else %}
+                  <td>-- Not Set --</td>
+                {% endif %} 
+                
+                {% if user.location %}
+                  <td>{{ user.location|capfirst }}</td>
+                {% else %}
+                  <td>-- Not Set --</td>
                 {% endif %}
-              </td>
-            </tr>
-          </form>
+
+                <td>
+                  {% if user.username != request.user.username %}
+                    <button type="submit" class="btn btn-danger m-1 btn-sm">
+                      DELETE
+                    </button>
+                  {% endif %}
+                </td>
+              </tr>
+            </form>
           {% endfor %}
         </tbody>
       </table>

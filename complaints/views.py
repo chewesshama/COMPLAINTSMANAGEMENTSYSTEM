@@ -284,6 +284,17 @@ def add_complaint(request):
                 targeted_personnel=form.cleaned_data["targeted_personnel"],
                 status=form.cleaned_data["status"],
             )
+            
+            attachments = []
+            for uploaded_file in request.FILES.getlist('attachments'):
+                    attachments.append(ComplaintAttachments(file=uploaded_file))
+
+            attachments = []
+            for uploaded_file in request.FILES.getlist('attachments'):
+                attachment = ComplaintAttachments(file=uploaded_file)
+                attachment.save()
+                attachments.append(attachment)
+
             attachments = []
             picture = request.FILES.get("picture")
             video = request.FILES.get("video")

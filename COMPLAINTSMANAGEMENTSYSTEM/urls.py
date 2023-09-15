@@ -7,7 +7,7 @@ from django.urls import path, re_path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("complaints.urls"), name="complaints"),
-    #    re_path(r'^.*$', custom_404_view)
+    # re_path(r'^.*$', custom_404_view)
 ]
 
 handler404 = "complaints.views.custom_404_view"
