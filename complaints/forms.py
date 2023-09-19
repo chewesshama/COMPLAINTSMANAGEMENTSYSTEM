@@ -6,7 +6,7 @@ from django.contrib.auth.forms import (
 )
 from .models import User, Department, Complaint
 from django.contrib.auth.models import Group
-from mtaa import tanzania
+from mtaa import tanzania, districts
 
 
 class CEORegistrationForm(UserCreationForm):
@@ -136,28 +136,45 @@ class UserProfileForm(forms.ModelForm):
         widget=forms.ClearableFileInput(attrs={"class": "form-control"})
     )
 
-    location = forms.ChoiceField(
-        choices=REGION_CHOICES,
-        label="location",
+    region = forms.ChoiceField(
+        label="Region",
+        choices=[(region, region) for region in tanzania],
+        required=False,
         widget=forms.Select(attrs={"class": "form-control"}),
     )
+
+    district = forms.ChoiceField(
+        label="District",
+        choices=[(district, district) for district in districts],
+        validators=[],
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+
+        self.fields["region"].choices = [("", "Select a Region")] + [
+            (region, region) for region in tanzania
+        ]
+
+        if "instance" in kwargs and kwargs["instance"]:
+            instance = kwargs["instance"]
+            if instance.region:
+                selected_region = instance.region
+                if hasattr(tanzania, selected_region):
+                    region = getattr(tanzania, selected_region)
+                    if hasattr(region, "districts"):
+                        districts = [
+                            (district, district) for district in region.districts
+                        ]
+                        self.fields["district"].choices = [
+                            ("", "Select a District")
+                        ] + districts
 
     phone_number = forms.CharField(
         label="phone number", widget=forms.TextInput(attrs={"class": "form-control"})
     )
-
-    #    def __init__(self, *args, **kwargs):
-    #        super(UserProfileForm, self).__init__(*args, **kwargs)
-    #        self.fields['residence_district'] = forms.ChoiceField(
-    #            choices=[],
-    #            label="District",
-    #            widget=forms.Select(attrs={'class': 'form-control'}),
-    #        )
-    #        self.fields['residence_ward'] = forms.ChoiceField(
-    #            choices=[],
-    #            label="Ward",
-    #            widget=forms.Select(attrs={'class': 'form-control'}),
-    #        )
 
     class Meta:
         model = User
@@ -168,7 +185,8 @@ class UserProfileForm(forms.ModelForm):
             "email",
             "profile_picture",
             "phone_number",
-            "location",
+            "region",
+            "district",
         )
 
 
@@ -202,7 +220,7 @@ class PasswordChangeCustomForm(PasswordChangeForm):
 
 class MultiFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('widget', forms.ClearableFileInput(attrs={'multiple': True}))
+        kwargs.setdefault("widget", forms.ClearableFileInput(attrs={"multiple": True}))
         super().__init__(*args, **kwargs)
 
 
@@ -217,7 +235,9 @@ class AddComplaintForm(forms.ModelForm):
 
     attachments = MultiFileField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}),
+        widget=forms.ClearableFileInput(
+            attrs={"multiple": True, "class": "form-control"}
+        ),
     )
 
     targeted_personnel = forms.ModelChoiceField(

@@ -79,11 +79,22 @@ Complaints management System
               {{ form.phone_number}}
             </div>
             <div class="form-group">
-              {% if form.location.errors %}
+              {% if form.region.errors %}
               <div class="alert alert-danger" role="alert">
-                {{ form.location.errors }}
+                {{ form.region.errors }}
               </div>
-              {% endif %} {{form.location.label_tag}} {{ form.location }}
+              {% endif %} 
+              {{form.region.label_tag}} 
+              {{ form.region }}
+            </div>
+            <div class="form-group">
+              {% if form.district.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.district.errors }}
+              </div>
+              {% endif %} 
+              {{form.district.label_tag}} 
+              {{ form.district }}
             </div>
             <div class="form-group d-flex justify-content-end">
               <abbr title="submit">
@@ -107,65 +118,34 @@ Complaints management System
   <script src="{% static 'assets/js/login.js' %}"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    $(document).ready(function () {
-      var regionSelect = $("#{{ form.residence_region.id_for_label }}");
-      var districtSelect = $("#{{ form.residence_district.id_for_label }}");
-      var wardSelect = $("#{{ form.residence_ward.id_for_label }}");
+      $(document).ready(function () {
+          var regionSelect = $('#{{ form.region.id_for_label }}');
+          var districtSelect = $('#{{ form.district.id_for_label }}');
 
-      districtSelect.hide();
-      wardSelect.hide();
+          regionSelect.on('change', function () {
+              var selectedRegion = $(this).val();
+              if (selectedRegion) {
+                  districtSelect.show();
+                  $.ajax({
+                      url: '/get_districts/?region_name=' + selectedRegion,
+                      success: function (data) {
+                        districtSelect.empty();
 
-      regionSelect.on("change", function () {
-        var selectedRegion = $(this).val();
-        if (selectedRegion) {
-          districtSelect.show();
-          wardSelect.hide();
+                        data.forEach(function (district) {
+                            districtSelect.append($('<option>', {
+                                value: district,
+                                text: district
+                            }));
+                        });
 
-          $.ajax({
-            url: "/get_districts/?region_name=" + selectedRegion,
-            success: function (data) {
-              districtSelect.empty();
-
-              data.forEach(function (district) {
-                districtSelect.append(
-                  $("<option>", {
-                    value: district,
-                    text: district,
-                  })
-                );
-              });
-            },
+                      }
+                  });
+              }
           });
-        } else {
-          districtSelect.hide();
-          wardSelect.hide();
-        }
       });
-
-      //			districtSelect.on('change', function () {
-      //				var selectedDistrict = $(this).val();
-      //				if (selectedDistrict) {
-      //					wardSelect.show();
-      //					$.ajax({
-      //						url: '/get_wards/?district_name=' + selectedDistrict,
-      //						success: function (data) {
-      //							wardSelect.empty();
-      //
-      //							data.forEach(function (ward) {
-      //								wardSelect.append($('<option>', {
-      //									value: ward,
-      //									text: ward
-      //								}));
-      //							});
-      //
-      //						}
-      //					});
-      //				} else {
-      //					wardSelect.hide();
-      //				}
-      //			});
-    });
   </script>
+
+
 
   {% endblock js %}
 </div>

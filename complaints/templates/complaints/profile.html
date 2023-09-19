@@ -34,8 +34,16 @@ Profile Page For CMS User
           </tr>
           <tr>
             <th scope="row">Residence Address:</th>
-            {% if user.location %}
-            <td>{{user.location|capfirst}}</td>
+            {% if user.region and user.district %}
+            <td>{{user.district|capfirst}}, {{user.region|capfirst}}</td>
+            {% elif user.region or user.district %}
+              {% if user.region %}
+              <td>{{user.region|capfirst}}</td>
+              {% elif user.district %}
+              <td>{{user.district|capfirst}}</td>
+              {% else %}
+              <td>-- Not Set --</td>
+              {% endif %}
             {% else %}
             <td>-- Not Set --</td>
             {% endif %}

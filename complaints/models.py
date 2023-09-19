@@ -1,5 +1,7 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from mtaa import districts
 
 
 class Department(models.Model):
@@ -28,12 +30,22 @@ STATUS_CHOICES = (
 
 
 class User(AbstractUser):
+    def validate_districts(value):
+        for district in districts:
+            if district["name"] == value:
+                return
+
+        raise ValidationError("The district is not known")
+
     departments = models.ManyToManyField(Department, blank=True)
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", default="default_pic.jpg", blank=True, null=True
     )
     phone_number = models.CharField(max_length=15, blank=True)
-    location = models.CharField(max_length=100, blank=True)
+    region = models.CharField(max_length=100, blank=True)
+    district = models.CharField(
+        max_length=100, blank=True, validators=[validate_districts]
+    )
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)

@@ -6,7 +6,6 @@ from .views import (
     UserRegistrationView,
     IndexView,
     UserLoginView,
-    userProfileUpdateView,
     ProfileView,
     UserRegistrationDoneView,
     AllUserDisplayView,
@@ -14,8 +13,11 @@ from .views import (
     DeleteUserView,
     PasswordChangeCustomView,
     PasswordChangeDoneView,
-    add_complaint,
     UserComplaintsDisplayView,
+    userProfileUpdateView,
+    add_complaint,
+    get_districts,
+    #get_wards,
 )
 
 
@@ -50,7 +52,8 @@ urlpatterns = [
         name="password_change_done",
     ),
     path("add_complaint/", add_complaint, name="add_complaint"),
-    #   re_path(r'^.*$', custom_404_view)
+    path("get_districts/", get_districts, name="get_districts"),
+    #path("get_wards/", get_wards, name="get_wards"),
 ]
 
 handler404 = "complaints.views.custom_404_view"

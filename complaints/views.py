@@ -16,6 +16,9 @@ from django.db.models import IntegerField
 from django.db.models import Case, When, Value, CharField
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
+from django.http import JsonResponse
+from mtaa import tanzania
+from .models import Complaint, User, ComplaintAttachments
 from .forms import (
     UserProfileForm,
     CEORegistrationForm,
@@ -25,7 +28,20 @@ from .forms import (
     PasswordChangeCustomForm,
     AddComplaintForm,
 )
-from .models import Complaint, User, ComplaintAttachments
+
+
+def get_districts(request):
+    region_name = request.GET.get('region_name')
+
+    if hasattr(tanzania, region_name):
+        region = getattr(tanzania, region_name)
+
+        if hasattr(region, 'districts'):
+            districts = region.districts
+            district_names = [district for district in districts]
+            return JsonResponse(district_names, safe=False)
+
+    return JsonResponse([], safe=False)
 
 
 def custom_404_view(request, exception=None):
