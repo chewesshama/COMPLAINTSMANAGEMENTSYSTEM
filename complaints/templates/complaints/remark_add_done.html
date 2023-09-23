@@ -1,0 +1,36 @@
+{% extends "complaints/base_form.html" %} 
+
+{% block form-content %}
+
+<h3 class="mb-4 text-success text-center">Remark Added successfully!</h3>
+<div class="container py-3">
+  <div class="justify-content-center">
+    <div class="row justify-content-between">
+      <div class="col-6">
+        <a
+          href="{% url 'complaints:complaint_details' complaint.pk %}"
+          class="nav-link"
+          title="complaint details"
+        >
+          <div class="form-group d-flex justify-content-start mt-5">
+            <button type="submit" class="btn btn-primary submit">
+              <span class="fa fa-inbox"></span>
+            </button>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-6">
+        <a href="{% url 'complaints:home' %}" class="nav-link" title="home">
+          <div class="form-group d-flex justify-content-end mt-5">
+            <button type="submit" class="btn btn-primary submit">
+              <span class="fa fa-home"></span>
+            </button>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock form-content %}

@@ -14,10 +14,13 @@ from .views import (
     PasswordChangeCustomView,
     PasswordChangeDoneView,
     UserComplaintsDisplayView,
+    ComplaintDetailsView,
+    RemarkAddedDone,
+    Users,
     userProfileUpdateView,
     add_complaint,
+    add_remark,
     get_districts,
-    #get_wards,
 )
 
 
@@ -30,6 +33,7 @@ urlpatterns = [
     path("login/", UserLoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("all-users/", AllUserDisplayView.as_view(), name="all_users_display"),
+    path("users/", Users.as_view(), name="users"),
     path(
         "all-complaints/",
         AllComplaintsDisplayView.as_view(),
@@ -40,6 +44,7 @@ urlpatterns = [
         UserComplaintsDisplayView.as_view(),
         name="user_complaints_display",
     ),
+    path("complaint/<int:pk>/", ComplaintDetailsView.as_view(), name="complaint_details"),
     path("profile/<int:pk>/", ProfileView.as_view(), name="profile"),
     path("update/<int:pk>/", userProfileUpdateView, name="profile_update"),
     path("delete_user/<int:pk>/", DeleteUserView.as_view(), name="delete_user"),
@@ -51,9 +56,10 @@ urlpatterns = [
         PasswordChangeDoneView.as_view(),
         name="password_change_done",
     ),
-    path("add_complaint/", add_complaint, name="add_complaint"),
+    path("add-complaint/", add_complaint, name="add_complaint"),
+    path("add-remark/", add_remark, name="add_remark"),
+    path("add-remark-done/<int:pk>/", RemarkAddedDone.as_view(), name="remark_added_done"),
     path("get_districts/", get_districts, name="get_districts"),
-    #path("get_wards/", get_wards, name="get_wards"),
 ]
 
 handler404 = "complaints.views.custom_404_view"

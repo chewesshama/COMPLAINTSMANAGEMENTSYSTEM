@@ -9,13 +9,25 @@
       <h2>My Complaints</h2>
       <p>List of complaints given out by You.</p>
     </div>
-
+    <div class="row mt-5">
+      <div class="col-md-2">
+        <button class="btn btn-dark text-light btn-sm">
+          <a
+            href="{% url 'complaints:add_complaint' %}"
+            class="nav-link text-light"
+            >Add Complaint</a
+          >
+        </button>
+      </div>
+    </div>
     <div class="faq-list">
       <ul>
         {% for complaint in complaints %} {% if complaint %}
 
         <li data-aos="fade-up" data-aos-delay="iterator">
+          <a href="{% url 'complaints:complaint_details' complaint.pk %}" class="m-2 nav-link p-5">
           <i class="bx bx-help-circle icon-help"></i>
+          </a>
           <a
             data-bs-toggle="collapse"
             data-bs-target="#faq-list-2"
@@ -28,15 +40,7 @@
             <p>{{complaint.description}}</p>
           </div>
         </li>
-        <div class="row mt-5">
-          <div class="col-md-2">
-            <button class="btn btn-dark text-light btn-sm">
-              <a href="#" class="nav-link text-light">Add Remark</a>
-            </button>
-          </div>
-        </div>
         {% else %}
-
         <p>you have no any complaint to display!!</p>
         <div class="hero-container">
           <a
@@ -45,20 +49,8 @@
             >Add Complaint Here</a
           >
         </div>
-
         {% endif %} {% endfor %}
       </ul>
-    </div>
-    <div class="row mt-5">
-      <div class="col-md-2">
-        <button class="btn btn-dark text-light btn-sm">
-          <a
-            href="{% url 'complaints:add_complaint' %}"
-            class="nav-link text-light"
-            >Add Complaint</a
-          >
-        </button>
-      </div>
     </div>
   </div>
 </section>

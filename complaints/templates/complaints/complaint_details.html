@@ -8,51 +8,40 @@
       <div class="container">
 
         <div class="section-title">
-          <h2>List of Complaints</h2>
-          <p>List of complaints given out by different Company Eployees and staffs.</p>
+          <h2>" {{complaint.title}} "  Complaints  Details</h2>
+          <p>Details on the " {{complaint.title}} " complaint and all the remarks added onto it.</p>
         </div>
+        <h1>TITLE: {{ complaint.title }}</h1>
+        <p>DESCROPTIONS: {{ complaint.description }}</p>
+        <p>COMPLAINANT: {{ complaint.complainant }}</p>
+        <p>TO_DEPARTMENT: {{ complaint.targeted_department }}</p>
+        <p>TO USER: {{ complaint.targeted_personnel }}</p>
+        <p>STATUS: {{ latest_status }}</p>
 
-        <div class="faq-list">
-          <ul>
-            {% for complaint in complaints %}
-                    <li data-aos="fade-up" data-aos-delay="iterator">
-                    <i class="bx bx-help-circle icon-help"></i> <a data-bs-toggle="collapse" data-bs-target="#faq-list-2" class="collapsed"> {{complaint.title}} <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
-                    <div id="faq-list-2" class="collapse" data-bs-parent=".faq-list">
-                        <p>
-                        {{complaint.description}}
-                        </p>
-                    </div>
-                    </li>
+        <h3>Remarks:</h3>
+        <ul>
+            {% for remark in remarks %}
+                <li>
+                    <p>Remark by: {{ remark.respondent }}</p>
+                    <p>DESCROPTIONS: {{ remark.content }}</p>
+                    <p>TO_DEPARTMENT: {{ remark.remark_targeted_department }}</p>
+                    <p>TO USER: {{ remark.remark_targeted_personnel }}</p>
+                    <p>STATUS: {{ latest_status }}</p>
+                </li>
+            {% empty %}
+                <li>No remarks for this complaint.</li>
             {% endfor %}
-          </ul>
-        </div>
+        </ul>
+
+        {% if latest_status != "Closed" %}
+            <button class="btn btn-dark text-light btn-sm">
+              <a href="{% url 'complaints:add_remark' %}" class="nav-link text-light">Add Remark</a>
+            </button>
+        {% else %}
+            <p style="font-weight: bold;">NOTE: This complaint is closed and no further remarks can be added.</p>
+        {% endif %}
 
       </div>
     </section><!-- End List of the Employees complaints -->
-
-
-    <!-- ======= Footer ======= -->
-    <footer id="footer">
-        <div class="footer-top">
-        <div class="container">
-
-            <div class="row  justify-content-center">
-            <div class="col-lg-6">
-                <h4>Complaints Management System</h4>
-            </div>
-            </div>
-
-            <div class="container footer-bottom clearfix">
-        <div class="copyright">
-            &copy; Copyright <strong><span>IctPack</span></strong>. All Rights Reserved
-        </div>
-        <div class="credits">
-            Designed by <a href="#">Shama Chewes</a>
-        </div>
-        </div>
-    </footer><!-- End Footer -->
-
-    <div id="preloader"></div>
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 {% endblock content %}

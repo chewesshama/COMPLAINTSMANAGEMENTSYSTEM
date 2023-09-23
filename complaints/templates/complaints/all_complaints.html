@@ -11,12 +11,34 @@
         List of complaints given out by different Company Eployees and staffs.
       </p>
     </div>
-
+    <div class="row mt-5 justify-content-around">
+      <div class="col-md-6">
+        <button class="btn btn-dark text-light btn-sm">
+          <a
+            href="{% url 'complaints:user_complaints_display' %}"
+            class="nav-link text-light"
+            >my Complaints</a
+          >
+        </button>
+      </div>
+      <div class="col-md-4">
+        <form method="get">
+          <div class="input-group">
+            <div class="form-outline">{{ user_search_form.search_query }}</div>
+            <button id="search-button" type="button" class="btn btn-secondary">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
     <div class="faq-list">
       <ul>
         {% for complaint in complaints %}
         <li data-aos="fade-up" data-aos-delay="iterator">
+          <a href="{% url 'complaints:complaint_details' complaint.pk %}" class="m-5 nav-link p-5">
           <i class="bx bx-help-circle icon-help"></i>
+          </a>
           <a
             data-bs-toggle="collapse"
             data-bs-target="#faq-list-2"
@@ -30,27 +52,9 @@
           <div id="faq-list-2" class="collapse" data-bs-parent=".faq-list">
             <p>{{complaint.description}}</p>
           </div>
-          <div class="row mt-5">
-            <div class="col-md-2">
-              <button class="btn btn-dark text-light btn-sm">
-                <a href="#" class="nav-link text-light">Add Remark</a>
-              </button>
-            </div>
-          </div>
         </li>
         {% endfor %}
       </ul>
-    </div>
-    <div class="row mt-5">
-      <div class="col-md-2">
-        <button class="btn btn-dark text-light btn-sm">
-          <a
-            href="{% url 'complaints:user_complaints_display' %}"
-            class="nav-link text-light"
-            >my Complaints</a
-          >
-        </button>
-      </div>
     </div>
   </div>
 </section>

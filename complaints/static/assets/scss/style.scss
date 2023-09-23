@@ -1,0 +1,81 @@
+
+
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+$font-family-sans-serif-2: 'Poppins', sans-serif;
+$font-family-serif: 'Source Serif Pro', serif;
+
+
+
+body {
+	font-family: $font-family-sans-serif;
+	
+}
+p {
+	color: darken(#ccc, 10%);
+	font-weight: 300;
+}
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: $font-family-sans-serif;
+}
+a {
+	transition: .3s all ease;
+	&, &:hover {
+		text-decoration: none!important;
+	}
+}
+.content {
+	height: 100vh;
+}
+
+
+// Modal 1
+.modal {
+	.modal-content {
+		box-shadow: 0 10px 50px -10px rgba($black, .3);
+		border: none;
+
+		.modal-header {
+			border-bottom: none;
+			padding-bottom: 0!important;
+			padding-left: 30px;
+			padding-right: 30px;
+			.modal-title {
+				h5 {
+					padding-bottom: 0;
+				}
+			}
+		} 
+		.modal-body {
+			padding-left: 30px;
+			padding-right: 30px;
+		}
+	}
+}
+
+
+.btn {
+	border-radius: 0px!important;
+	border: none;
+	box-shadow: 0 7px 0px -2px rgba($primary, .3);
+	padding: 10px 20px!important;
+	&:active, &:focus {
+		outline: none;
+		box-shadow: none!important;
+	}
+}
+
+.fade2 {
+  transform: scale(0.0);
+  opacity: 0;
+  transition: all .2s linear;
+  display: block !important;
+}
+
+.fade2.show {
+  opacity: 1;
+  transform: scale(1);
+}

@@ -1,4 +1,5 @@
 {% extends "complaints/base_form.html" %} 
+{% load widget_tweaks %}
 
 {% block form-content %}
 <h3 class="mb-4">Register</h3>
@@ -10,7 +11,8 @@
     <div class="alert alert-danger" role="alert">
       {{ form.first_name.errors }}
     </div>
-    {% endif %} {{form.first_name.label_tag}} {{ form.first_name }}
+    {% endif %} {{form.first_name.label_tag}} 
+    {% render_field form.first_name class="form-control" %}
   </div>
 
   <div class="form-group">
@@ -18,7 +20,7 @@
     <div class="alert alert-danger" role="alert">
       {{ form.last_name.errors }}
     </div>
-    {% endif %} {{form.last_name.label_tag}} {{ form.last_name }}
+    {% endif %} {{form.last_name.label_tag}} {% render_field form.last_name class="form-control" %}
   </div>
 
   <div class="form-group">

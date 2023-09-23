@@ -1,4 +1,3 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import (
     TemplateView,
@@ -18,7 +17,7 @@ from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.http import JsonResponse
 from mtaa import tanzania
-from .models import Complaint, User, ComplaintAttachments
+from .models import Complaint, Remark, User, ComplaintAttachments
 from .forms import (
     UserProfileForm,
     CEORegistrationForm,
@@ -27,7 +26,9 @@ from .forms import (
     UserSearchForm,
     PasswordChangeCustomForm,
     AddComplaintForm,
+    AddRemarkForm,
 )
+from django.db import transaction
 
 
 def get_districts(request):
@@ -191,10 +192,14 @@ class PasswordChangeDoneView(LoginRequiredMixin, TemplateView):
     template_name = "complaints/password_change_done.html"
 
 
-class AllUserDisplayView(PermissionRequiredMixin, ListView):
+class AllUserDisplayView(PermissionRequiredMixin, TemplateView):
     permission_required = "complaints.view_user"
-    model = User
     template_name = "complaints/all_users.html"
+
+
+class Users(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "complaints/users.html"
     context_object_name = "users"
 
     def get_context_data(self, **kwargs):
@@ -250,8 +255,14 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
     template_name = "complaints/all_complaints.html"
     context_object_name = "complaints"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_search_form"] = UserSearchForm(self.request.GET)
+        return context
+
     def get_queryset(self):
         user = self.request.user
+        search_query = self.request.GET.get("search_query")
 
         if user.groups.filter(name="CEO").exists() or user.is_superuser:
             queryset = Complaint.objects.all()
@@ -263,6 +274,15 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
                 queryset = Complaint.objects.none()
         else:
             queryset = Complaint.objects.none()
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query)
+                | Q(description__icontains=search_query)
+                | Q(complainant__username__icontains=search_query)
+                | Q(targeted_department__name__icontains=search_query)
+                | Q(targeted_personnel__username__icontains=search_query)
+            )
 
         return queryset
 
@@ -282,57 +302,179 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
     permission_required = "complaints.view_user"
     model = Complaint
     template_name = "complaints/complaint_details.html"
-    context_object_name = "complaints"
+    context_object_name = "complaint"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        complaint = self.get_object()
+        remarks = complaint.remarker.all()
+
+        latest_remark = remarks.last()
+        latest_status = latest_remark.status if latest_remark else complaint.status
+
+        context['remarks'] = remarks
+        context['latest_status'] = latest_status
+        return context
 
 
 @login_required
 def add_complaint(request):
     if request.method == "POST":
-        form = AddComplaintForm(request.POST, request.FILES)
-        if form.is_valid():
-            complaint = form.save(commit=False)
+        try:
+            with transaction.atomic():  # Use a transaction to ensure integrity
+                form = AddComplaintForm(request.POST, request.FILES)
+                if form.is_valid():
+                    attachment_type = form.cleaned_data['attachment_type']
+                    attachments = []
 
-            complaint = Complaint(
-                title=form.cleaned_data["title"],
-                description=form.cleaned_data["description"],
-                complainant=request.user,
-                targeted_department=form.cleaned_data["targeted_department"],
-                targeted_personnel=form.cleaned_data["targeted_personnel"],
-                status=form.cleaned_data["status"],
-            )
-            
-            attachments = []
-            for uploaded_file in request.FILES.getlist('attachments'):
-                    attachments.append(ComplaintAttachments(file=uploaded_file))
+                    if attachment_type == "picture":
+                        picture = request.FILES.get("picture")
+                        if picture:
+                            attachment = ComplaintAttachments(picture=picture)
+                            attachment.save()
+                            attachments.append(attachment)
+                    elif attachment_type == "voice":
+                        voice = request.FILES.get("voice")
+                        if voice:
+                            attachment = ComplaintAttachments(voice=voice)
+                            attachment.save()
+                            attachments.append(attachment)
+                    elif attachment_type == "video":
+                        video = request.FILES.get("video")
+                        if video:
+                            attachment = ComplaintAttachments(video=video)
+                            attachment.save()
+                            attachments.append(attachment)
+                    elif attachment_type == "file":
+                        file = request.FILES.get("file")
+                        if file:
+                            attachment = ComplaintAttachments(file=file)
+                            attachment.save()
+                            attachments.append(attachment)
+                    elif attachment_type == "all":
+                        picture = request.FILES.get("picture")
+                        video = request.FILES.get("video")
+                        voice = request.FILES.get("voice")
+                        file = request.FILES.get("file")
 
-            attachments = []
-            for uploaded_file in request.FILES.getlist('attachments'):
-                attachment = ComplaintAttachments(file=uploaded_file)
-                attachment.save()
-                attachments.append(attachment)
+                        if picture:
+                            attachment = ComplaintAttachments(picture=picture)
+                            attachment.save()
+                            attachments.append(attachment)
+                        if video:
+                            attachment = ComplaintAttachments(video=video)
+                            attachment.save()
+                            attachments.append(attachment)
+                        if voice:
+                            attachment = ComplaintAttachments(voice=voice)
+                            attachment.save()
+                            attachments.append(attachment)
+                        if file:
+                            attachment = ComplaintAttachments(file=file)
+                            attachment.save()
+                            attachments.append(attachment)
 
-            attachments = []
-            picture = request.FILES.get("picture")
-            video = request.FILES.get("video")
-            voice = request.FILES.get("voice")
-            file = request.FILES.get("file")
+                    complaint = Complaint(
+                        title=form.cleaned_data["title"],
+                        description=form.cleaned_data["description"],
+                        complainant=request.user,
+                        targeted_department=form.cleaned_data["targeted_department"],
+                        targeted_personnel=form.cleaned_data["targeted_personnel"],
+                        status=form.cleaned_data["status"],
+                    )
 
-            if picture:
-                attachments.append(ComplaintAttachments(picture=picture))
-            if video:
-                attachments.append(ComplaintAttachments(video=video))
-            if voice:
-                attachments.append(ComplaintAttachments(voice=voice))
-            if file:
-                attachments.append(ComplaintAttachments(file=file))
-
-            complaint.save()
-
-            complaint.attachments.set(attachments)
-
-            return redirect("complaints:user_complaints_display")
+                    complaint.save()
+                    complaint.attachments.set(attachments)
+                    return redirect("complaints:user_complaints_display")
+        except Exception as e:
+            print(f"Error saving complaint: {e}")
     else:
         form = AddComplaintForm()
 
     context = {"form": form}
     return render(request, "complaints/add_complaint_form.html", context)
+
+
+@login_required
+def add_remark(request):
+    if request.method == "POST":
+        form = AddRemarkForm(request.POST, request.FILES)
+        if form.is_valid():
+            attachment_type = form.cleaned_data['attachment_type']
+            attachments = []
+
+            if attachment_type == "picture":
+                picture = request.FILES.get("picture")
+                if picture:
+                    attachment = ComplaintAttachments(picture=picture)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "voice":
+                voice = request.FILES.get("voice")
+                if voice:
+                    attachment = ComplaintAttachments(voice=voice)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "video":
+                video = request.FILES.get("video")
+                if video:
+                    attachment = ComplaintAttachments(video=video)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "file":
+                file = request.FILES.get("file")
+                if file:
+                    attachment = ComplaintAttachments(file=file)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "all":
+                picture = request.FILES.get("picture")
+                video = request.FILES.get("video")
+                voice = request.FILES.get("voice")
+                file = request.FILES.get("file")
+
+                if picture:
+                    attachment = ComplaintAttachments(picture=picture)
+                    attachment.save()
+                    attachments.append(attachment)
+                if video:
+                    attachment = ComplaintAttachments(video=video)
+                    attachment.save()
+                    attachments.append(attachment)
+                if voice:
+                    attachment = ComplaintAttachments(voice=voice)
+                    attachment.save()
+                    attachments.append(attachment)
+                if file:
+                    attachment = ComplaintAttachments(file=file)
+                    attachment.save()
+                    attachments.append(attachment)
+
+            remark = Remark(
+                complaint=form.cleaned_data["complaint"],
+                content=form.cleaned_data["content"],
+                respondent=request.user,
+                remark_targeted_department=form.cleaned_data["remark_targeted_department"],
+                remark_targeted_personnel=form.cleaned_data["remark_targeted_personnel"],
+                status=form.cleaned_data["status"],
+            )
+
+            remark.save()
+            remark.attachments.set(attachments)
+
+            
+            complaint = form.cleaned_data["complaint"]
+
+            url = reverse("complaints:remark_added_done", args=[complaint.pk])
+            return redirect(url)
+    else:
+        form = AddRemarkForm()
+
+    context = {"form": form}
+    return render(request, "complaints/add_remark.html", context)
+
+class RemarkAddedDone(LoginRequiredMixin, DetailView):
+    model = Complaint
+    context_object_name = "complaint"
+    template_name = 'complaints/remark_add_done.html'
+    

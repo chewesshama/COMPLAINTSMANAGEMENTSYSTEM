@@ -4,18 +4,18 @@ from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
 )
-from .models import User, Department, Complaint
+from .models import Remark, User, Department, Complaint
 from django.contrib.auth.models import Group
 from mtaa import tanzania, districts
 
 
 class CEORegistrationForm(UserCreationForm):
     first_name = forms.CharField(
-        label="firstname", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="firstname", widget=forms.TextInput
     )
 
     last_name = forms.CharField(
-        label="lastname", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="lastname", widget=forms.TextInput
     )
 
     username = forms.CharField(
@@ -226,11 +226,28 @@ class MultiFileField(forms.FileField):
 
 class AddComplaintForm(forms.ModelForm):
     title = forms.CharField(
-        label="title", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="title", 
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
     description = forms.CharField(
-        label="description", widget=forms.Textarea(attrs={"class": "form-control"})
+        label="description",
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+    )
+
+    ATTACHMENT_CHOICES = [
+        ("picture", "Picture"),
+        ("voice", "Voice"),
+        ("video", "Video"),
+        ("file", "File"),
+        ("all", "All"),
+    ]
+
+    attachment_type = forms.ChoiceField(
+        choices=ATTACHMENT_CHOICES,
+        label="Attachment Type",
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
     attachments = MultiFileField(
@@ -270,8 +287,81 @@ class AddComplaintForm(forms.ModelForm):
         fields = [
             "title",
             "description",
+            "attachment_type",
             "attachments",
             "targeted_department",
             "targeted_personnel",
+            "status",
+        ]
+
+
+class AddRemarkForm(forms.ModelForm):
+    complaint = forms.ModelChoiceField(
+        queryset=Complaint.objects.all(),
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    content = forms.CharField(
+        label="description", widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+
+    ATTACHMENT_CHOICES = [
+        ("picture", "Picture"),
+        ("voice", "Voice"),
+        ("video", "Video"),
+        ("file", "File"),
+        ("all", "All"),
+    ]
+
+    attachment_type = forms.ChoiceField(
+        choices=ATTACHMENT_CHOICES,
+        label="Attachment Type",
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    attachments = MultiFileField(
+        required=False,
+        widget=forms.ClearableFileInput(
+            attrs={"multiple": True, "class": "form-control"}
+        ),
+    )
+
+    remark_targeted_personnel = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="Forward / respond to",
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    remark_targeted_department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        required=True,
+        label="Department",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    STATUS_CHOICES = (
+        ("Opened", "Opened"),
+        ("Forwarded", "Forwarded"),
+        ("Closed", "Closed"),
+    )
+
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        label="status",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = Remark
+        fields = [
+            "complaint",
+            "content",
+            "attachment_type",
+            "attachments",
+            "remark_targeted_department",
+            "remark_targeted_personnel",
             "status",
         ]

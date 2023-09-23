@@ -59,7 +59,7 @@ class Complaint(models.Model):
     description = models.TextField()
     complainant = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     attachments = models.ManyToManyField(ComplaintAttachments)
-    targeted_department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    targeted_department = models.ForeignKey(Department, related_name="complaint_department", on_delete=models.CASCADE)
     targeted_personnel = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="complaints_targeted"
     )
@@ -67,17 +67,54 @@ class Complaint(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    department_history = models.ManyToManyField(Department, through='DepartmentHistory', related_name="history", blank=True)
+
+    class Meta:
+        ordering = ['-date_added']
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            original_complaint = Complaint.objects.get(pk=self.pk)
+            if self.status != original_complaint.status:
+                DepartmentHistory.objects.create(
+                    complaint=self,
+                    department=self.targeted_department,
+                    status=self.status
+                )
+
+        super(Complaint, self).save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.title},  by  {self.complainant}"
 
 
 class Remark(models.Model):
     respondent = models.ForeignKey(User, on_delete=models.CASCADE)
-    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE)
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name="remarker")
     content = models.TextField()
     attachments = models.ManyToManyField(ComplaintAttachments)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Opened")
+    remark_targeted_personnel = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="remark_target", default=1
+    )
+    remark_targeted_department = models.ForeignKey(Department, on_delete=models.CASCADE, default=1)
     date = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if self.status == "Forwarded":
+            self.complaint.targeted_department = self.remark_targeted_department
+            self.complaint.status = self.status
+            self.complaint.save()
+        super(Remark, self).save(*args, **kwargs)
+
     def __str__(self):
-        return f"{ self.complaint }  -  {self.content},  by  {self.author}"
+        return f"{ self.complaint }  -  {self.content},  by  {self.respondent}"
+
+
+class DepartmentHistory(models.Model):
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Opened")
+
+    def __str__(self):
+        return f"{self.status} ({self.department})"
