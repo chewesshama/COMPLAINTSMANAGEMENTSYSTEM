@@ -7,20 +7,29 @@
   {% csrf_token %} {% if user.is_authenticated %}
   <div class="row">
     <div class="col-12">
-      <h3 class="py-2 text-danger text-center">
-        You are already logged In. First logout, To switch account?
+      <h3 class="py-2 text-center" style="color: orangered;">
+        You are already logged In as <span class="font-weight-bold text-uppercase">{{request.user}}</span>. Logout first, To switch account !
       </h3>
     </div>
   </div>
   <div class="row">
-    <div class="col-md-12">
-      <button class="justify-content-center">
-        <a
-          href="{% url 'complaints:home' %}"
-          class="btn btn-dark btn-sm text-white"
-          >Go Home</a
-        >
-      </button>
+    <div class="col-sm-6 form-group d-flex justify-content-center mt-5">
+      <abbr title="Home">
+        <a href="{% url 'complaints:home' %}">
+        <button type="button" class="btn btn-primary submit">
+          <span class="fa fa-home"></span>
+        </button>
+        </a>
+      </abbr>
+    </div>
+    <div class="col-sm-6 form-group d-flex justify-content-center mt-5">
+      <abbr title="Logout">
+        <a href="{% url 'complaints:logout' %}">
+        <button type="button" class="btn btn-primary submit">
+          <span class="fa fa-sign-out"></span>
+        </button>
+        </a>
+      </abbr>
     </div>
   </div>
   {% else %} {% if form.errors %}

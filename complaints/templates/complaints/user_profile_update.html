@@ -31,70 +31,78 @@ Complaints management System
           >
             {% csrf_token %} {{ form.non_field_errors }}
             <div class="form-group">
+              {{form.first_name.label_tag}} {{ form.first_name }}
               {% if form.first_name.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.first_name.errors }}
               </div>
-              {% endif %} {{form.first_name.label_tag}} {{ form.first_name }}
+              {% endif %} 
             </div>
 
             <div class="form-group">
+              {{form.last_name.label_tag}} {{ form.last_name }}
               {% if form.last_name.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.last_name.errors }}
               </div>
-              {% endif %} {{form.last_name.label_tag}} {{ form.last_name }}
+              {% endif %} 
             </div>
 
             <div class="form-group">
+              {{form.username.label_tag}} {{ form.username }}
               {% if form.username.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.username.errors }}
               </div>
-              {% endif %} {{form.username.label_tag}} {{ form.username }}
+              {% endif %} 
             </div>
             <div class="form-group">
+              {{form.email.label_tag}} {{ form.email }}
               {% if form.email.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.email.errors }}
               </div>
-              {% endif %} {{form.email.label_tag}} {{ form.email }}
+              {% endif %} 
             </div>
             <div class="form-group">
+              {{form.profile_picture.label_tag}} 
+              {{ form.profile_picture }}
               {% if form.profile_picture.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.profile_picture.errors }}
               </div>
               {% endif %} 
-              {{form.profile_picture.label_tag}} 
-              {{ form.profile_picture }}
+              
             </div>
             <div class="form-group">
+              {{form.phone_number.label_tag}} 
+              {{ form.phone_number}}
               {% if form.phone_number.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.phone_number.errors }}
               </div>
               {% endif %} 
-              {{form.phone_number.label_tag}} 
-              {{ form.phone_number}}
+              
             </div>
             <div class="form-group">
+              {{form.region.label_tag}} 
+              {{ form.region }}
               {% if form.region.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.region.errors }}
               </div>
               {% endif %} 
-              {{form.region.label_tag}} 
-              {{ form.region }}
+              
             </div>
             <div class="form-group">
+              {{form.district.label_tag}} 
+              {{ form.district }}
               {% if form.district.errors %}
               <div class="alert alert-danger" role="alert">
                 {{ form.district.errors }}
               </div>
               {% endif %} 
-              {{form.district.label_tag}} 
-              {{ form.district }}
+              
             </div>
             <div class="form-group d-flex justify-content-end">
               <abbr title="submit">

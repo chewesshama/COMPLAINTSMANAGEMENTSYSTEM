@@ -3,45 +3,101 @@
 
 {% block content %}
 
-    <!-- ======= List of the Employees complaints ======= -->
-    <section id="faq" class="faq section-bg">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>" {{complaint.title}} "  Complaints  Details</h2>
-          <p>Details on the " {{complaint.title}} " complaint and all the remarks added onto it.</p>
+    <section>
+      <div class="container p-2">
+        <div class="border shadow p-4">
+          <h2 class="my-2">{{complaint.title|upper}}</h2>
+          <ul class="list-group">
+            <li class="list-group-item m-1 bg-secondary border-secondary rounded shadow active" >
+              <div class="row justify-content-between">
+                <div class="col-sm-11">
+                  Complaint Details
+                </div>             
+                <div class="col-sm-1">
+                  <form action="{% url 'complaints:delete_complaint' complaint.pk %}" method="POST">
+                    {% csrf_token %}
+                      {% if latest_status == 'Closed' %}
+                      <abbr class="col-sm-2" title="delete Complaint">
+                        <button type="submit" class="btn shadow btn-white m-1 btn-sm">
+                          <i class="fa fa-remove" style="font-size:20px; color:red"></i>
+                        </button>
+                      </abbr>
+                    {% endif %}
+                  </form>
+                </div>
+            </div>
+            </li>
+            <table class="table my-3">
+              <tbody>
+                <tr>
+                  <th scope="row">Title :</th>
+                  <td>{{ complaint.title|capfirst }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Descriptions :</th>
+                  <td>{{ complaint.description|capfirst }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Complainant :</th>
+                  <td>{{ complaint.complainant|capfirst }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Targeted Department :</th>
+                  <td>{{ complaint.targeted_department|capfirst }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Targeted Personnel :</th>
+                  <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Status :</th>
+                  {% if latest_status == 'Opened' %}
+                    <td class="font-weight-bold text-primary">{{ latest_status|upper }}</td>
+                  {% elif latest_status == 'Forwarded' %}
+                  <td class="font-weight-bold text-success">{{ latest_status|upper }}</td>
+                  {% elif latest_status == 'Closed' %}
+                  <td class="font-weight-bold text-danger">{{ latest_status|upper }} <i class="fa fa-ban mx-2"></i></td>
+                  {% endif %}
+                </tr>
+              </tbody>
+            </table>
+          </ul>
         </div>
-        <h1>TITLE: {{ complaint.title }}</h1>
-        <p>DESCROPTIONS: {{ complaint.description }}</p>
-        <p>COMPLAINANT: {{ complaint.complainant }}</p>
-        <p>TO_DEPARTMENT: {{ complaint.targeted_department }}</p>
-        <p>TO USER: {{ complaint.targeted_personnel }}</p>
-        <p>STATUS: {{ latest_status }}</p>
 
-        <h3>Remarks:</h3>
-        <ul>
-            {% for remark in remarks %}
-                <li>
-                    <p>Remark by: {{ remark.respondent }}</p>
-                    <p>DESCROPTIONS: {{ remark.content }}</p>
-                    <p>TO_DEPARTMENT: {{ remark.remark_targeted_department }}</p>
-                    <p>TO USER: {{ remark.remark_targeted_personnel }}</p>
-                    <p>STATUS: {{ latest_status }}</p>
-                </li>
-            {% empty %}
-                <li>No remarks for this complaint.</li>
-            {% endfor %}
-        </ul>
+        <div class="container py-4 border shadow">
+          <h4 class="my-2">Remarks</h4>
+          {% for remark in remarks %}
+            <ul class="list-group my-1 pb-3">
+              <li class="list-group-item m-1 bg-light border-secondary rounded active">
+                <small>
+                <div class="row justify-content-between">
+                  <div class="col-sm-11 text-dark font-weight-bold">
+                    Remark By: {{ remark.respondent }}
+                  </div>
+                  <div class="col-sm-1">
+                    <a title="view details" hx-get="{% url 'complaints:view_remark_details' remark.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                  </div>
+                </div>
+                </small>
+              </li>
+            </ul>
+          {% empty %}
+            <ul class="list-group py-3">
+              <li class="text-danger list-unstyled">No remarks for this complaint.</li>
+            </ul>
+          {% endfor %}
 
-        {% if latest_status != "Closed" %}
-            <button class="btn btn-dark text-light btn-sm">
-              <a href="{% url 'complaints:add_remark' %}" class="nav-link text-light">Add Remark</a>
-            </button>
-        {% else %}
-            <p style="font-weight: bold;">NOTE: This complaint is closed and no further remarks can be added.</p>
-        {% endif %}
+          {% if latest_status != "Closed" %}
+              <button class="btn text-dark shadow btn-secondary btn-sm my-2">
+                <a href="{% url 'complaints:add_remark' complaint_id=complaint.pk %}" class="nav-link text-light">Add Remark</a>
+              </button>
+          {% else %}
+              <p class="my-2 text-danger list-unstyled font-weight-bold pb-5 text-center text-uppercase"><i class="fa fa-ban fa-2x mx-2"></i> NOTE: This complaint is resolved and closed, no further remarks can be added <i class="fa fa-ban fa-2x mx-2"></i></p>
+          {% endif %}
+        
+        </div>
 
       </div>
-    </section><!-- End List of the Employees complaints -->
+    </section>
 
 {% endblock content %}

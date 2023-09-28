@@ -1,10 +1,147 @@
 {% extends "complaints/base.html" %} 
 {% load static %} 
 
+
 {% block content %}
 
-<div hx-get="{% url 'complaints:users' %}" hx-trigger="load" class="container-fluid p-3">
-  <tr>Loading....</tr>
+<div class="container-fluid p-3">
+  <section class="border p-4 mb-4 d-flex flex-column shadow">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <h3 class="text-dark">List Of All CMS Users</h3>
+      </div>
+
+    </nav>
+    <div class="row justify-content-between">
+      <div class="col-sm-9 d-flex">
+        <abbr title="Add User">
+          <a
+            href="{% url 'complaints:register' %}"
+            class="nav-link text-light"
+            >
+          <button type="button" class="btn btn-secondary rounded submit shadow-sm">
+            <span class="fa fa-plus"></span>
+          </button>
+          </a>
+        </abbr>
+      </div>
+      <div class="col-sm-3 d-flex">
+        <form method="get">
+          <div class="input-group">
+            <div class="form-outline">{{ user_search_form.search_query }}</div>
+            <button id="search-button" type="button" class="btn btn-secondary">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="border shadow p-4 mb-4">
+    <div>
+      <table class="table table-hover">
+        <thead class="table-black">
+          <tr>
+            <th scope="col">Full Name</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Department</th>
+            <th scope="col">Position</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Residence Address</th>
+            <th class="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <form
+              action="{% url 'complaints:delete_user' user.pk %}"
+              method="POST"
+            >
+              {% csrf_token %}
+              <tr>
+                {% if user.first_name and user.last_name %}
+                <td>
+                  {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}
+                </td>
+                {% elif user.first_name or user.last_name %} 
+                  {% if user.first_name%}
+                  <td>{{ user.first_name }}</td>
+                  {% elif user.last_name %}
+                  <td>{{ user.last_name }}</td>
+                  {% endif %} 
+                {% else %}
+                  <td>-- Not Set --</td>
+                {% endif %} 
+                {% if user.username %}
+                  <td>{{ user.username|capfirst }}</td>
+                {% else %}
+                <td>-- Not Set --</td>
+                {% endif %} {% if user.email %}
+                <td>{{ user.email|capfirst }}</td>
+                {% else %}
+                <td>-- Not Set --</td>
+                {% endif %} 
+
+                {% if user.departments.all %} 
+                  {% for department in user.departments.all %} 
+                    {% if department.name %}
+                      <td>{{ department.name|upper }}</td>
+                    {% else %}
+                      <td>-- Not Set --</td>
+                    {% endif %} 
+                  {% endfor %} 
+                {% else %}
+                  <td>None</td>
+                {% endif %} 
+                
+                {% for group in user.groups.all %} 
+                  {% if group.name %}
+                    <td>{{ group.name }}</td>
+                  {% else %}
+                    <td>-- Not Set --</td>
+                  {% endif %} 
+                {% endfor %} 
+
+                {% if user.phone_number %}
+                  <td>{{ user.phone_number }}</td>
+                {% else %}
+                  <td>-- Not Set --</td>
+                {% endif %} 
+                    
+                {% if user.region and user.district %}
+                <td>{{user.district|capfirst}}, {{user.region|capfirst}}</td>
+                {% elif user.region or user.district %}
+                  {% if user.region %}
+                    <td>{{user.region|capfirst}}</td>
+                  {% endif %}
+                  {% if user.district %}
+                    <td>{{user.district|capfirst}}</td>
+                  {% endif %}
+                {% else %}
+                  <td>-- Not Set --</td>
+                {% endif %}
+                <td>
+                  {% if user.username != request.user.username %}
+                    <button type="button" class="btn btn-white m-1 btn-sm">
+                      <a hx-get="{% url 'complaints:staff_user_profile' user.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="font-size:20px; color:#6c757d"></i></a>
+                    </button>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-white m-1 btn-sm">
+                      <i class="fa fa-remove" style="font-size:20px; color:red"></i>
+                    </button>
+                  {% endif %}
+                </td>
+              </tr>
+            </form>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
 {% endblock content %}

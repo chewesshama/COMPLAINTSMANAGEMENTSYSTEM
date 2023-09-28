@@ -37,7 +37,7 @@ class CEORegistrationForm(UserCreationForm):
 
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
-        required=True,
+        required=False,
         label="Department",
         widget=forms.Select(attrs={"class": "form-control"}),
     )
@@ -190,7 +190,7 @@ class UserProfileForm(forms.ModelForm):
         )
 
 
-class UserSearchForm(forms.Form):
+class SearchForm(forms.Form):
     search_query = forms.CharField(
         max_length=100,
         required=False,
@@ -276,12 +276,6 @@ class AddComplaintForm(forms.ModelForm):
         ("Closed", "Closed"),
     )
 
-    status = forms.ChoiceField(
-        choices=STATUS_CHOICES,
-        label="status",
-        widget=forms.Select(attrs={"class": "form-control"}),
-    )
-
     class Meta:
         model = Complaint
         fields = [
@@ -290,8 +284,7 @@ class AddComplaintForm(forms.ModelForm):
             "attachment_type",
             "attachments",
             "targeted_department",
-            "targeted_personnel",
-            "status",
+            "targeted_personnel"
         ]
 
 
@@ -343,7 +336,6 @@ class AddRemarkForm(forms.ModelForm):
     )
 
     STATUS_CHOICES = (
-        ("Opened", "Opened"),
         ("Forwarded", "Forwarded"),
         ("Closed", "Closed"),
     )

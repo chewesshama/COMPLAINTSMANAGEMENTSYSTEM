@@ -2,71 +2,71 @@
 
 {% block form-content %}
 <h3 class="mb-4">Add Complaint</h3>
-<form method="post" class="signup-form my-5">
+<form method="post" class="signup-form my-5" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="form-group">
+    {{form.title.label_tag}} 
+    {{ form.title }}
     {% if form.title.errors %}
     <div class="alert alert-danger" role="alert">{{ form.title.errors }}</div>
     {% endif %} 
-    {{form.title.label_tag}} 
-    {{ form.title }}
   </div>
   <div class="form-group">
+    {{form.complainant.label_tag}} 
+    {{ form.complainant }}
     {% if form.complainant.errors %}
     <div class="alert alert-danger" role="alert">
       {{ form.complainant.errors }}
     </div>
     {% endif %} 
-    {{form.complainant.label_tag}} 
-    {{ form.complainant }}
   </div>
   <div class="form-group">
+    {{form.description.label_tag}} 
+    {{ form.description }}
     {% if form.description.errors %}
     <div class="alert alert-danger" role="alert">
       {{ form.description.errors }}
     </div>
     {% endif %} 
-    {{form.description.label_tag}} 
-    {{ form.description }}
   </div>
   <div class="form-group">
+      {{ form.attachment_type.label_tag }}
+      {{ form.attachment_type }}
       {% if form.attachment_type.errors %}
       <div class="alert alert-danger" role="alert">
         {{ form.attachment_type.errors }}
       </div>
       {% endif %}
-      {{ form.attachment_type.label_tag }}
-      {{ form.attachment_type }}
   </div>
   <div class="form-group">
-    {% if form.attachmrents.errors %}
+    {{form.attachments.label_tag}} 
+    {{ form.attachments }}
+    {% if form.attachments.errors %}
     <div class="alert alert-danger" role="alert">
       {{ form.attachments.errors }}
     </div>
     {% endif %} 
-    {{form.attachments.label_tag}} 
-    {{ form.attachments }}
   </div>
   <div class="form-group">
-    {% if form.remark_targeted_department.errors %}
+    {{form.targeted_department.label_tag}} 
+    {{form.targeted_department }}
+    {% if form.targeted_department.errors %}
     <div class="alert alert-danger" role="alert">
-      {{ form.remark_targeted_department.errors }}
+      {{ form.targeted_department.errors }}
     </div>
     {% endif %} 
-    {{form.remark_remark_targeted_department.label_tag}} 
-    {{form.remark_targeted_department }}
   </div>
   <div class="form-group">
-    {% if form.remark_targeted_personnel.errors %}
+    {{form.targeted_personnel.label_tag}} 
+    {{ form.targeted_personnel}}
+    {% if form.targeted_personnel.errors %}
     <div class="alert alert-danger" role="alert">
-      {{ form.remark_targeted_personnel.errors }}
+      {{ form.targeted_personnel.errors }}
     </div>
-    {% endif %} 
-    {{form.remark_targeted_personnel.label_tag}} 
-    {{ form.remark_targeted_personnel}}
+    {% endif %}
   </div>
   <div class="form-group d-flex justify-content-end mt-5">
-    <abbr title="register">
+    <abbr title="add complaint">
       <button type="submit" class="btn btn-primary submit">
         <span class="fa fa-plus"></span>
       </button>

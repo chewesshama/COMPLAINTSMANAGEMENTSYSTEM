@@ -3,59 +3,97 @@
 
 {% block content %}
 
-<section id="faq" class="faq section-bg">
-  <div class="container">
-    <div class="section-title">
-      <h2>List of Complaints</h2>
-      <p>
-        List of complaints given out by different Company Eployees and staffs.
-      </p>
-    </div>
-    <div class="row mt-5 justify-content-around">
-      <div class="col-md-6">
-        <button class="btn btn-dark text-light btn-sm">
-          <a
-            href="{% url 'complaints:user_complaints_display' %}"
-            class="nav-link text-light"
-            >my Complaints</a
-          >
-        </button>
-      </div>
-      <div class="col-md-4">
-        <form method="get">
-          <div class="input-group">
-            <div class="form-outline">{{ user_search_form.search_query }}</div>
-            <button id="search-button" type="button" class="btn btn-secondary">
-              <i class="fa fa-search" aria-hidden="true"></i>
-            </button>
+<section>
+    <div class="container p-3">
+      <section class="border p-4 mb-4 d-flex flex-column shadow">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+            <div class="col-md-4 d-flex">
+              <button class="btn rounded text-white bg-secondary btn-sm shadow-sm" >
+                <a
+                  href="{% url 'complaints:user_complaints_display' %}"
+                  class="nav-link"
+                  >MY COMPLAINTS</a
+                >
+              </button>
+            </div>
+            <form method="get">
+              <div class="input-group">
+                <div class="form-outline">{{ user_search_form.search_query }}</div>
+                <button id="search-button" type="submit" class="btn rounded btn-secondary">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </nav>
+      </section>
+
+      <div class="list-group border shadow p-3">
+        <a href="#" class="list-group-item bg-secondary mb-2 border-secondary rounded shadow list-group-item-action active">
+          List of Complaints
+        </a>
+        <table class="table table-hover" style="cursor: pointer;">
+          <thead>
+            <tr>
+              <th scope="col">TILE</th>
+              <th scope="col">COMPLAINANT</th>
+              <th scope="col">TARGETED PETSONNEL</th>
+              <th scope="col">TARGETED DEPARTMENT</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for complaint in complaints %}
+              {% if complaint.targeted_personnel == request.user %}
+                {% if latest_status == 'closed' %}
+                  
+                    <tr class="list-group-item list-group-item-action">
+                      <td>{{complaint.title|upper}} <small>closed</small></td>
+                      <td>{{ complaint.complainant|capfirst }}</td>
+                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                      <td>{{ complaint.targeted_department|capfirst }}</td>
+                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
+                    </tr>
+
+                {% else %}
+                  
+                    <tr>
+                      <td>{{complaint.title|upper}}</td>
+                      <td>{{ complaint.complainant|capfirst }}</td>
+                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                      <td>{{ complaint.targeted_department|capfirst }}</td>
+                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
+                    </tr>
+                
+                {% endif %}
+              {% else %}
+                {% if latest_status == 'closed' %}
+                  
+                    <tr>
+                      <td>{{complaint.title|upper}} <small>closed</small></td>
+                      <td>{{ complaint.complainant|capfirst }}</td>
+                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                      <td>{{ complaint.targeted_department|capfirst }}</td>
+                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" aria-hidden="true"></i></a></td>
+                    </tr>
+                  
+                {% else %}
+                  
+                    <tr>
+                      <td>{{complaint.title|upper}}</td>
+                      <td>{{ complaint.complainant|capfirst }}</td>
+                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                      <td>{{ complaint.targeted_department|capfirst }}</td>
+                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
+                    </tr>
+                  
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-    </div>
-    <div class="faq-list">
-      <ul>
-        {% for complaint in complaints %}
-        <li data-aos="fade-up" data-aos-delay="iterator">
-          <a href="{% url 'complaints:complaint_details' complaint.pk %}" class="m-5 nav-link p-5">
-          <i class="bx bx-help-circle icon-help"></i>
-          </a>
-          <a
-            data-bs-toggle="collapse"
-            data-bs-target="#faq-list-2"
-            class="collapsed"
-          >
-            {{complaint.title}} by {{ complaint.complainant }}<i
-              class="bx bx-chevron-down icon-show"
-            ></i
-            ><i class="bx bx-chevron-up icon-close"></i
-          ></a>
-          <div id="faq-list-2" class="collapse" data-bs-parent=".faq-list">
-            <p>{{complaint.description}}</p>
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
   </div>
 </section>
 

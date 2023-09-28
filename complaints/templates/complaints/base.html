@@ -59,13 +59,16 @@
 		/>
 		<link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
 		<link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
 	</head>
 	<body>
 		{% if request.path == '/' %} {% elif user.is_authenticated %}
 		<!-- ======= Header ======= -->
 		<header id="header" class="d-flex align-items-center">
 			<div
-				class="container-fluid d-flex align-items-center justify-content-lg-between"
+				class="container-fluid d-flex align-items-center justify-content-lg-between shadow-sm"
 			>
 				<h1 class="logo me-auto me-lg-0">
 					<a
@@ -80,7 +83,8 @@
 
 						<li>
 							<a
-								class="nav-link scrollto active"
+								class="nav-link scrollto"
+								id="nav-link-home"
 								href="{% url 'complaints:home' %}"
 								>Home</a
 							>
@@ -88,34 +92,30 @@
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-all-complaints"
 								href="{% url 'complaints:all_complaints_display' %}"
-								>All complaints</a
+								>Complaints</a
 							>
 						</li>
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-all-users"
 								href="{% url 'complaints:all_users_display' %}"
-								>All Employees</a
+								>Employees</a
+							>
+						</li>
+						<li>
+							<a class="nav-link scrollto" id="nav-link-admin-panel" href="{% url 'admin:index' %}"
+								>Admin</a
 							>
 						</li>
 						<li>
 							<a
 								class="nav-link scrollto"
-								href="{% url 'complaints:register' %}"
-								>Register</a
-							>
-						</li>
-						<li>
-							<a class="nav-link scrollto" href="{% url 'admin:index' %}"
-								>Admin Panel</a
-							>
-						</li>
-						<li>
-							<a
-								class="nav-link scrollto"
+								id="nav-link-profile"
 								href="{% url 'complaints:profile' user.pk %}"
-								>My Profile</a
+								>Profile</a
 							>
 						</li>
 						<li>
@@ -128,7 +128,8 @@
 
 						<li>
 							<a
-								class="nav-link scrollto active"
+								class="nav-link scrollto"
+								id="nav-link-home"
 								href="{% url 'complaints:home' %}"
 								>Home</a
 							>
@@ -136,6 +137,7 @@
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-department-complaints"
 								href="{% url 'complaints:all_complaints_display' %}"
 								>Department Complaints</a
 							>
@@ -143,6 +145,7 @@
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-all-users"
 								href="{% url 'complaints:all_users_display' %}"
 								>Department Employees</a
 							>
@@ -150,15 +153,9 @@
 						<li>
 							<a
 								class="nav-link scrollto"
-								href="{% url 'complaints:register' %}"
-								>Register</a
-							>
-						</li>
-						<li>
-							<a
-								class="nav-link scrollto"
+								id="nav-link-profile"
 								href="{% url 'complaints:profile' user.pk %}"
-								>My Profile</a
+								>Profile</a
 							>
 						</li>
 						<li>
@@ -171,7 +168,8 @@
 
 						<li>
 							<a
-								class="nav-link scrollto active"
+								class="nav-link scrollto"
+								id="nav-link-home"
 								href="{% url 'complaints:home' %}"
 								>Home</a
 							>
@@ -179,6 +177,7 @@
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-my-complaints"
 								href="{% url 'complaints:user_complaints_display' %}"
 								>My Complaints</a
 							>
@@ -186,8 +185,9 @@
 						<li>
 							<a
 								class="nav-link scrollto"
+								id="nav-link-profile"
 								href="{% url 'complaints:profile' user.pk %}"
-								>My Profile</a
+								>Profile</a
 							>
 						</li>
 						<li>
@@ -209,6 +209,11 @@
 		<!--block for contents-->
 		<div>{% block content %} {% endblock content %}</div>
 		<!--endblock for contents-->
+		<div id="modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  			<div id="dialog" class="modal-dialog modal-dialog-scrollable">
+				
+			</div>
+		</div>
 
 		<!-- Vendor JS Files -->
 		{% block js %} {% endblock js %}
@@ -218,19 +223,17 @@
 			crossorigin="anonymous"
 		></script>
 		<script src="{% static 'assets/js/htmx.min.js' %}"></script>
+		<script src="{% static 'assets/js/dialog.js' %}"></script>
 		<script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
 		<script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
 		<script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
 		<script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
 
 		<script src="{% static 'js/bootstrap.js' %}" async defer></script>
 		<script src="{% static 'assets/js/main.js' %}"></script>
-		<script>
-			document
-				.getElementById("goBackButton")
-				.addEventListener("click", function () {
-					window.history.back();
-				});
-		</script>
+
+
 	</body>
 </html>

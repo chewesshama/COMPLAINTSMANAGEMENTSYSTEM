@@ -90,7 +90,7 @@ class Complaint(models.Model):
 
 class Remark(models.Model):
     respondent = models.ForeignKey(User, on_delete=models.CASCADE)
-    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name="remarker")
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name="remarks")
     content = models.TextField()
     attachments = models.ManyToManyField(ComplaintAttachments)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Opened")

@@ -13,9 +13,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import IntegerField
 from django.db.models import Case, When, Value, CharField
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from django.urls import reverse, reverse_lazy
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from mtaa import tanzania
 from .models import Complaint, Remark, User, ComplaintAttachments
 from .forms import (
@@ -23,7 +23,7 @@ from .forms import (
     CEORegistrationForm,
     HODRegistrationForm,
     LoginForm,
-    UserSearchForm,
+    SearchForm,
     PasswordChangeCustomForm,
     AddComplaintForm,
     AddRemarkForm,
@@ -32,12 +32,12 @@ from django.db import transaction
 
 
 def get_districts(request):
-    region_name = request.GET.get('region_name')
+    region_name = request.GET.get("region_name")
 
     if hasattr(tanzania, region_name):
         region = getattr(tanzania, region_name)
 
-        if hasattr(region, 'districts'):
+        if hasattr(region, "districts"):
             districts = region.districts
             district_names = [district for district in districts]
             return JsonResponse(district_names, safe=False)
@@ -192,19 +192,15 @@ class PasswordChangeDoneView(LoginRequiredMixin, TemplateView):
     template_name = "complaints/password_change_done.html"
 
 
-class AllUserDisplayView(PermissionRequiredMixin, TemplateView):
+class AllUserDisplayView(PermissionRequiredMixin, ListView):
     permission_required = "complaints.view_user"
     template_name = "complaints/all_users.html"
-
-
-class Users(LoginRequiredMixin, ListView):
     model = User
-    template_name = "complaints/users.html"
     context_object_name = "users"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_search_form"] = UserSearchForm(self.request.GET)
+        context["user_search_form"] = SearchForm(self.request.GET)
         return context
 
     def get_queryset(self):
@@ -257,7 +253,25 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_search_form"] = UserSearchForm(self.request.GET)
+        context["user_search_form"] = SearchForm(self.request.GET)
+
+        queryset = self.get_queryset()
+
+        complaint = queryset.first()
+
+        remarks = complaint.remarker.all() if complaint else []
+
+        latest_remark = remarks.last()
+        latest_status = (
+            latest_remark.status
+            if latest_remark
+            else complaint.status
+            if complaint
+            else None
+        )
+
+        context["remarks"] = remarks
+        context["latest_status"] = latest_status
         return context
 
     def get_queryset(self):
@@ -292,17 +306,65 @@ class UserComplaintsDisplayView(LoginRequiredMixin, ListView):
     template_name = "complaints/my_complaints.html"
     context_object_name = "complaints"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_search_form"] = SearchForm(self.request.GET)
+        return context
+
     def get_queryset(self):
-        return Complaint.objects.filter(complainant=self.request.user).order_by(
-            "-date_added"
-        )
+        search_query = self.request.GET.get("search_query")
+        print("Search Query:", search_query)
+
+        user_remarks_subquery = Remark.objects.filter(
+            remark_targeted_personnel=self.request.user
+        ).values("complaint_id")
+
+        queryset = Complaint.objects.filter(
+            Q(complainant=self.request.user)
+            | Q(targeted_personnel=self.request.user)
+            | Q(id__in=Subquery(user_remarks_subquery))
+        ).order_by("-date_added")
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query)
+                | Q(description__icontains=search_query)
+                | Q(complainant__username__icontains=search_query)
+                | Q(targeted_department__name__icontains=search_query)
+                | Q(targeted_personnel__username__icontains=search_query)
+            )
+            print("Filtered Queryset Count:", queryset.count())
+
+        return queryset
+
+
+class DeleteComplaintView(PermissionRequiredMixin, DeleteView):
+    permission_required = "complaints.delete_complaint"
+    model = Complaint
+    success_url = reverse_lazy("complaints:user_complaints_display")
 
 
 class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
-    permission_required = "complaints.view_user"
+    permission_required = "complaints.view_complaint"
     model = Complaint
     template_name = "complaints/complaint_details.html"
     context_object_name = "complaint"
+
+    def get_object(self, queryset=None):
+        complaint = super().get_object(queryset=queryset)
+
+        user = self.request.user
+        if (
+            user == complaint.complainant
+            or user == complaint.targeted_personnel
+            or user.username
+            == complaint.remark_set.filter(remark_targeted_personnel=user.username)
+            .first()
+            .remark_targeted_personnel.username
+        ):
+            return complaint
+        else:
+            raise Http404("You are not allowed to view this complaint.")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -312,82 +374,79 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
         latest_remark = remarks.last()
         latest_status = latest_remark.status if latest_remark else complaint.status
 
-        context['remarks'] = remarks
-        context['latest_status'] = latest_status
+        context["remarks"] = remarks
+        context["latest_status"] = latest_status
         return context
 
 
 @login_required
 def add_complaint(request):
     if request.method == "POST":
-        try:
-            with transaction.atomic():  # Use a transaction to ensure integrity
-                form = AddComplaintForm(request.POST, request.FILES)
-                if form.is_valid():
-                    attachment_type = form.cleaned_data['attachment_type']
-                    attachments = []
+        form = AddComplaintForm(request.POST, request.FILES)
+        if form.is_valid():
+            attachment_type = form.cleaned_data["attachment_type"]
+            attachments = []
 
-                    if attachment_type == "picture":
-                        picture = request.FILES.get("picture")
-                        if picture:
-                            attachment = ComplaintAttachments(picture=picture)
-                            attachment.save()
-                            attachments.append(attachment)
-                    elif attachment_type == "voice":
-                        voice = request.FILES.get("voice")
-                        if voice:
-                            attachment = ComplaintAttachments(voice=voice)
-                            attachment.save()
-                            attachments.append(attachment)
-                    elif attachment_type == "video":
-                        video = request.FILES.get("video")
-                        if video:
-                            attachment = ComplaintAttachments(video=video)
-                            attachment.save()
-                            attachments.append(attachment)
-                    elif attachment_type == "file":
-                        file = request.FILES.get("file")
-                        if file:
-                            attachment = ComplaintAttachments(file=file)
-                            attachment.save()
-                            attachments.append(attachment)
-                    elif attachment_type == "all":
-                        picture = request.FILES.get("picture")
-                        video = request.FILES.get("video")
-                        voice = request.FILES.get("voice")
-                        file = request.FILES.get("file")
+            if attachment_type == "picture":
+                picture = request.FILES.get("picture")
+                if picture:
+                    attachment = ComplaintAttachments(picture=picture)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "voice":
+                voice = request.FILES.get("voice")
+                if voice:
+                    attachment = ComplaintAttachments(voice=voice)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "video":
+                video = request.FILES.get("video")
+                if video:
+                    attachment = ComplaintAttachments(video=video)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "file":
+                file = request.FILES.get("file")
+                if file:
+                    attachment = ComplaintAttachments(file=file)
+                    attachment.save()
+                    attachments.append(attachment)
+            elif attachment_type == "all":
+                picture = request.FILES.get("picture")
+                video = request.FILES.get("video")
+                voice = request.FILES.get("voice")
+                file = request.FILES.get("file")
 
-                        if picture:
-                            attachment = ComplaintAttachments(picture=picture)
-                            attachment.save()
-                            attachments.append(attachment)
-                        if video:
-                            attachment = ComplaintAttachments(video=video)
-                            attachment.save()
-                            attachments.append(attachment)
-                        if voice:
-                            attachment = ComplaintAttachments(voice=voice)
-                            attachment.save()
-                            attachments.append(attachment)
-                        if file:
-                            attachment = ComplaintAttachments(file=file)
-                            attachment.save()
-                            attachments.append(attachment)
+                if picture:
+                    attachment = ComplaintAttachments(picture=picture)
+                    attachment.save()
+                    attachments.append(attachment)
+                if video:
+                    attachment = ComplaintAttachments(video=video)
+                    attachment.save()
+                    attachments.append(attachment)
+                if voice:
+                    attachment = ComplaintAttachments(voice=voice)
+                    attachment.save()
+                    attachments.append(attachment)
+                if file:
+                    attachment = ComplaintAttachments(file=file)
+                    attachment.save()
+                    attachments.append(attachment)
 
-                    complaint = Complaint(
-                        title=form.cleaned_data["title"],
-                        description=form.cleaned_data["description"],
-                        complainant=request.user,
-                        targeted_department=form.cleaned_data["targeted_department"],
-                        targeted_personnel=form.cleaned_data["targeted_personnel"],
-                        status=form.cleaned_data["status"],
-                    )
+            complaint = Complaint(
+                title=form.cleaned_data["title"],
+                description=form.cleaned_data["description"],
+                complainant=request.user,
+                targeted_department=form.cleaned_data["targeted_department"],
+                targeted_personnel=form.cleaned_data["targeted_personnel"],
+                status="Opened",
+            )
 
-                    complaint.save()
-                    complaint.attachments.set(attachments)
-                    return redirect("complaints:user_complaints_display")
-        except Exception as e:
-            print(f"Error saving complaint: {e}")
+            complaint.save()
+            complaint.attachments.set(attachments)
+            return redirect("complaints:user_complaints_display")
+
     else:
         form = AddComplaintForm()
 
@@ -396,11 +455,14 @@ def add_complaint(request):
 
 
 @login_required
-def add_remark(request):
+def add_remark(request, complaint_id):
+    complaint = get_object_or_404(Complaint, pk=complaint_id)
     if request.method == "POST":
-        form = AddRemarkForm(request.POST, request.FILES)
+        form = AddRemarkForm(
+            request.POST, request.FILES, initial={"complaint": complaint}
+        )
         if form.is_valid():
-            attachment_type = form.cleaned_data['attachment_type']
+            attachment_type = form.cleaned_data["attachment_type"]
             attachments = []
 
             if attachment_type == "picture":
@@ -454,27 +516,43 @@ def add_remark(request):
                 complaint=form.cleaned_data["complaint"],
                 content=form.cleaned_data["content"],
                 respondent=request.user,
-                remark_targeted_department=form.cleaned_data["remark_targeted_department"],
-                remark_targeted_personnel=form.cleaned_data["remark_targeted_personnel"],
+                remark_targeted_department=form.cleaned_data[
+                    "remark_targeted_department"
+                ],
+                remark_targeted_personnel=form.cleaned_data[
+                    "remark_targeted_personnel"
+                ],
                 status=form.cleaned_data["status"],
             )
 
             remark.save()
             remark.attachments.set(attachments)
 
-            
             complaint = form.cleaned_data["complaint"]
 
             url = reverse("complaints:remark_added_done", args=[complaint.pk])
             return redirect(url)
     else:
-        form = AddRemarkForm()
+        form = AddRemarkForm(initial={"complaint": complaint})
 
     context = {"form": form}
     return render(request, "complaints/add_remark.html", context)
 
+
 class RemarkAddedDone(LoginRequiredMixin, DetailView):
     model = Complaint
     context_object_name = "complaint"
-    template_name = 'complaints/remark_add_done.html'
-    
+    template_name = "complaints/remark_add_done.html"
+
+
+class RemarkDetailView(LoginRequiredMixin, DetailView):
+    model = Remark
+    template_name = "complaints/remark_details.html"
+    context_object_name = "remark"
+
+
+class StaffUserProfileView(PermissionRequiredMixin, DetailView):
+    permission_required = "complaints.view_user"
+    model = User
+    template_name = "complaints/users_profile.html"
+    context_object_name = "user"

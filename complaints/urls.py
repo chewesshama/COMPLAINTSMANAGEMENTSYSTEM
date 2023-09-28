@@ -14,9 +14,11 @@ from .views import (
     PasswordChangeCustomView,
     PasswordChangeDoneView,
     UserComplaintsDisplayView,
+    DeleteComplaintView,
     ComplaintDetailsView,
     RemarkAddedDone,
-    Users,
+    RemarkDetailView,
+    StaffUserProfileView,
     userProfileUpdateView,
     add_complaint,
     add_remark,
@@ -33,12 +35,13 @@ urlpatterns = [
     path("login/", UserLoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("all-users/", AllUserDisplayView.as_view(), name="all_users_display"),
-    path("users/", Users.as_view(), name="users"),
+    path("staffs_user_profile_view/<int:pk>/", StaffUserProfileView.as_view(), name="staff_user_profile"),
     path(
         "all-complaints/",
         AllComplaintsDisplayView.as_view(),
         name="all_complaints_display",
     ),
+    path("delete_complaint/<int:pk>/", DeleteComplaintView.as_view(), name="delete_complaint"),
     path(
         "user-complaints/",
         UserComplaintsDisplayView.as_view(),
@@ -57,8 +60,9 @@ urlpatterns = [
         name="password_change_done",
     ),
     path("add-complaint/", add_complaint, name="add_complaint"),
-    path("add-remark/", add_remark, name="add_remark"),
+    path('add_remark/<int:complaint_id>/', add_remark, name='add_remark'),
     path("add-remark-done/<int:pk>/", RemarkAddedDone.as_view(), name="remark_added_done"),
+    path('remark/<int:pk>/', RemarkDetailView.as_view(), name='view_remark_details'),
     path("get_districts/", get_districts, name="get_districts"),
 ]
 

@@ -1,5 +1,6 @@
 {% extends "complaints/base.html" %} 
 {% load static %} 
+{% load custom_tag %}
 
 {% block title %} 
 Profile Page For CMS User 
@@ -9,68 +10,84 @@ Profile Page For CMS User
 
 <div class="conent-section container py-5">
   <div class="media">
-    {% if user.profile_picture %} <img src="{{ user.profile_picture.url }}"
-    class="rounded-circle account-img"" style="height: 100px; width: 100px;"
-    alt="{{ user.username }}'s Profile Image"> {% else %} <img src="{% static
-    'default_pic.png' %}" class="rounded-circle account-img"" style="height:
-    100px; width: 100px;" alt="Default Profile Image"> {% endif %}
-    <div class="media-body">
-      <h2 class="account-heading my-2">
-        {{user.first_name|upper}} {{user.last_name|upper}}
-      </h2>
-      <table class="table my-4">
-        <tbody>
-          <tr>
-            <th scope="row">Username:</th>
-            <td>{{ user.username|upper }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Email:</th>
-            {% if user.email %}
-            <td>{{ user.email|capfirst }}</td>
-            {% else %}
-            <td>-- Not Set --</td>
-            {% endif %}
-          </tr>
-          <tr>
-            <th scope="row">Residence Address:</th>
-            {% if user.region and user.district %}
-            <td>{{user.district|capfirst}}, {{user.region|capfirst}}</td>
-            {% elif user.region or user.district %}
-              {% if user.region %}
-              <td>{{user.region|capfirst}}</td>
-              {% elif user.district %}
-              <td>{{user.district|capfirst}}</td>
+    <div class="border shadow p-4">
+      {% if user.profile_picture %} <img src="{{ user.profile_picture.url }}"
+      class="rounded-circle account-img"" style="height: 100px; width: 100px;"
+      alt="{{ user.username }}'s Profile Image"> {% else %} <img src="{% static
+      'default_pic.png' %}" class="rounded-circle account-img"" style="height:
+      100px; width: 100px;" alt="Default Profile Image"> {% endif %}
+      <div class="media-body">
+        <h2 class="account-heading my-2">
+          {{user.first_name|upper}} {{user.last_name|upper}}
+        </h2>
+        <table class="table my-4">
+          <tbody>
+            <tr>
+              <th scope="row">Username :</th>
+              <td>{{ user.username|upper }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Email :</th>
+              {% if user.email %}
+              <td>{{ user.email|capfirst }}</td>
               {% else %}
               <td>-- Not Set --</td>
               {% endif %}
-            {% else %}
-            <td>-- Not Set --</td>
+            </tr>
+            <tr>
+              <th scope="row">Residence Address :</th>
+              {% if user.region and user.district %}
+              <td>{{user.district|capfirst}}, {{user.region|capfirst}}</td>
+              {% elif user.region or user.district %}
+                {% if user.region %}
+                <td>{{user.region|capfirst}}</td>
+                {% elif user.district %}
+                <td>{{user.district|capfirst}}</td>
+                {% else %}
+                <td>-- Not Set --</td>
+                {% endif %}
+              {% else %}
+              <td>-- Not Set --</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th scope="row">Phone Number :</th>
+              {% if user.phone_number %}
+              <td>{{user.phone_number}}</td>
+              {% else %}
+              <td>-- Not Set --</td>
+              {% endif %}
+            </tr>
+            {% if not user|has_group:'CEO' and not user.is_superuser %}
+            <tr>
+              <th scope="row">Department :</th>
+              {% if user.departments.all %} 
+                {% for department in user.departments.all %} 
+                  {% if department.name %}
+                    <td>{{ department.name|capfirst }}</td>
+                  {% else %}
+                    <td>-- Not Set --</td>
+                  {% endif %} 
+                {% endfor %} 
+              {% else %}
+                <td>-- Not Set --</td>
+              {% endif %} 
+            </tr>
             {% endif %}
-          </tr>
-          <tr>
-            <th scope="row">Phone Number:</th>
-            {% if user.phone_number %}
-            <td>{{user.phone_number}}</td>
-            {% else %}
-            <td>-- Not Set --</td>
-            {% endif %}
-          </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="row mt-5 justify-content-between">
-      <div class="col-md-2">
-        <button class="btn btn-dark text-light btn-sm">
-          <a
-            href="{% url 'complaints:profile_update' user.pk %}"
+    <div class="row mt-5 justify-content-between border shadow p-4">
+      <div class="col-sm-2">
+        <button class="btn text-light btn-sm btn-secondary shadow">
+          <a href="{% url 'complaints:profile_update' user.pk %}"
             class="nav-link text-light"
-            >Update</a
-          >
+            >Update</a>
         </button>
       </div>
-      <div class="col-md-2">
-        <button class="btn btn-dark text-light btn-sm">
+      <div class="col-sm-2">
+        <button class="btn text-light btn-sm btn-secondary shadow">
           <a
             href="{% url 'complaints:password_change' %}"
             class="nav-link text-light"

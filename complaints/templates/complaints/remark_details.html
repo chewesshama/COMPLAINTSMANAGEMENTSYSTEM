@@ -1,0 +1,48 @@
+{% extends "complaints/dialog.html" %}
+{% load static %}
+
+{% block dialog-content %}
+<!-- Modal -->
+<div class="modal-content shadow p-4">
+    <small>
+    <div class="modal-header border shadow">
+        <h5 class="modal-title" id="exampleModalLongTitle">{{ remark.complaint|upper }} <small>( {{remark.respondent}}'s remark )</small></h5>
+    </div>
+    <div class="modal-body border shadow">
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <th class="row">Complaint :</th>
+                    <td>{{ remark.complaint }}</td>
+                </tr>
+                <tr>
+                    <th class="row">Remark By :</th>
+                    <td>{{ remark.respondent }}</td>
+                </tr>
+                <tr>
+                    <th class="row">Descriptions :</th>
+                    <td>{{ remark.content }}</td>
+                </tr>
+                <tr>
+                    <th class="row">Targeted Department :</th>
+                    <td>{{ remark.remark_targeted_department }}</td>
+                </tr>
+                <tr>
+                    <th class="row">Targeted Personnel :</th>
+                    <td>{{ remark.remark_targeted_personnel }}</td>
+                </tr>
+                <tr>
+                    <th class="row">Status :</th>
+                    <td class="text-success">{{ remark.status }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer pb-5">
+        <div class="form-group d-flex justify-content-end mb-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </small>
+</div>
+{% endblock dialog-content %}
