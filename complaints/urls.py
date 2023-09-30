@@ -19,6 +19,10 @@ from .views import (
     RemarkAddedDone,
     RemarkDetailView,
     StaffUserProfileView,
+    UpdateComplaintView,
+    UpdateComplaintDoneView,
+    UpdateRemarkView,
+    DeleteRemarkView,
     userProfileUpdateView,
     add_complaint,
     add_remark,
@@ -42,6 +46,8 @@ urlpatterns = [
         name="all_complaints_display",
     ),
     path("delete_complaint/<int:pk>/", DeleteComplaintView.as_view(), name="delete_complaint"),
+    path("complaint_update/<int:pk>/", UpdateComplaintView.as_view(), name="update_complaint"),
+    path("complaint_update_done/", UpdateComplaintDoneView.as_view(), name="complaint_update_done"),
     path(
         "user-complaints/",
         UserComplaintsDisplayView.as_view(),
@@ -62,6 +68,8 @@ urlpatterns = [
     path("add-complaint/", add_complaint, name="add_complaint"),
     path('add_remark/<int:complaint_id>/', add_remark, name='add_remark'),
     path("add-remark-done/<int:pk>/", RemarkAddedDone.as_view(), name="remark_added_done"),
+    path("remark_update/<int:pk>/", UpdateRemarkView.as_view(), name="remark_update"),
+    path("delete_remark/<int:pk>/", DeleteRemarkView.as_view(), name="delete_remark"),
     path('remark/<int:pk>/', RemarkDetailView.as_view(), name='view_remark_details'),
     path("get_districts/", get_districts, name="get_districts"),
 ]

@@ -5,6 +5,7 @@ from django.views.generic import (
     ListView,
     DetailView,
     DeleteView,
+    UpdateView
 )
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordChangeView
@@ -26,7 +27,9 @@ from .forms import (
     SearchForm,
     PasswordChangeCustomForm,
     AddComplaintForm,
+    UpdateComplaintForm,
     AddRemarkForm,
+    UpdateRemarkForm,
 )
 from django.db import transaction
 
@@ -259,7 +262,7 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
 
         complaint = queryset.first()
 
-        remarks = complaint.remarker.all() if complaint else []
+        remarks = complaint.remarks.all() if complaint else []
 
         latest_remark = remarks.last()
         latest_status = (
@@ -344,6 +347,22 @@ class DeleteComplaintView(PermissionRequiredMixin, DeleteView):
     success_url = reverse_lazy("complaints:user_complaints_display")
 
 
+class UpdateComplaintView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'complaints.change_complaint'
+    model = Complaint
+    form_class = UpdateComplaintForm
+    template_name = 'complaints/update_complaint_form.html'
+    context_object_name = 'complaint'
+
+    def get_success_url(self):
+        return reverse_lazy('complaints:complaint_details', kwargs={'pk': self.object.pk})
+
+
+class UpdateComplaintDoneView(PermissionRequiredMixin, TemplateView):
+    permission_required = 'complaint.change_complaint'
+    template_name = 'complaint/complaint_update_done.html'
+
+
 class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
     permission_required = "complaints.view_complaint"
     model = Complaint
@@ -352,16 +371,16 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         complaint = super().get_object(queryset=queryset)
-
         user = self.request.user
+
         if (
             user == complaint.complainant
             or user == complaint.targeted_personnel
-            or user.username
-            == complaint.remark_set.filter(remark_targeted_personnel=user.username)
-            .first()
-            .remark_targeted_personnel.username
+            or user.is_superuser
+            or Remark.objects.filter(complaint=complaint, remark_targeted_personnel=user).exists()
         ):
+            return complaint
+        elif user.groups.filter(name='CEO').exists():
             return complaint
         else:
             raise Http404("You are not allowed to view this complaint.")
@@ -369,7 +388,7 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         complaint = self.get_object()
-        remarks = complaint.remarker.all()
+        remarks = complaint.remarks.all()
 
         latest_remark = remarks.last()
         latest_status = latest_remark.status if latest_remark else complaint.status
@@ -550,6 +569,36 @@ class RemarkDetailView(LoginRequiredMixin, DetailView):
     template_name = "complaints/remark_details.html"
     context_object_name = "remark"
 
+
+class UpdateRemarkView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'complaints.change_remark'
+    model = Remark
+    form_class = UpdateRemarkForm
+    template_name = 'complaints/update_remark_form.html'
+    context_object_name = 'remark'
+    
+    def get_object(self, queryset=None):
+        remark = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if (
+            user == remark.respondent
+        ):
+            return remark
+        else:
+            raise Http404("You are not allowed to view this remark.")
+
+    def get_success_url(self):
+        return reverse_lazy('complaints:complaint_details', kwargs={'pk': self.object.pk})
+
+
+class DeleteRemarkView(PermissionRequiredMixin, DeleteView):
+    permission_required = "complaints.delete_remark"
+    model = Remark
+
+    def get_success_url(self):
+            complaint = self.object.complaint 
+            return reverse_lazy('complaints:complaint_details', kwargs={'pk': complaint.pk})
 
 class StaffUserProfileView(PermissionRequiredMixin, DetailView):
     permission_required = "complaints.view_user"

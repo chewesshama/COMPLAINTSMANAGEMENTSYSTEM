@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
     "widget_tweaks",
     "PIL",
+    "django_htmx",
     "complaints.apps.ComplaintsConfig",
     "crispy_forms",
 ]
@@ -43,6 +44,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 ROOT_URLCONF = "COMPLAINTSMANAGEMENTSYSTEM.urls"

@@ -1,0 +1,43 @@
+{% extends "complaints/base_form.html" %} 
+
+{% block form-content %}
+
+<h3 class="mb-4 text-success text-center">Are you sure want to Deleta this Complaint</h3>
+<div class="container py-3">
+  <div class="justify-content-center">
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <a
+            href="{% url 'complaints:complaint_details' complaint.pk %}"
+            class="nav-link"
+            title="complaint details"
+            >
+            <div class="form-group d-flex justify-content-center mt-5">
+                
+                <button type="button" class="btn btn-primary submit">
+                <span class="fa fa-remove"></span>
+                </button>
+               
+            </div>
+            </a>
+        </div>
+      <div class="col-6">
+        <a
+          href="{% url 'complaints:complaint_details' complaint.pk %}"
+          class="nav-link"
+          title="complaint details"
+        >
+          <div class="form-group d-flex justify-content-center mt-5">
+            <form method="POST">
+            <button type="button" class="btn btn-primary submit">
+              <span class="fa fa-check"></span>
+            </button>
+            </form>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock form-content %}

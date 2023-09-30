@@ -49,14 +49,44 @@
                   <th scope="row">Targeted Personnel :</th>
                   <td>{{ complaint.targeted_personnel|capfirst }}</td>
                 </tr>
-                <tr>
-                  <th scope="row">Status :</th>
+                
                   {% if latest_status == 'Opened' %}
-                    <td class="font-weight-bold text-primary">{{ latest_status|upper }}</td>
+                  <tr>
+                    <th scope="row">Status :</th>
+                    <td class="font-weight-bold text-success">{{ latest_status|upper }}</td>
+                  </tr>
+                      {% if request.user == complaint.complainant %}
+                      <tr>
+                        <td>
+                          <button class="btn text-light btn-sm btn-secondary shadow">
+                            <a href="{% url 'complaints:update_complaint' complaint.pk %}"
+                              class="nav-link text-light"
+                              >Update</a>
+                          </button>
+                        </td>
+                      </tr>
+                      {% endif %}
                   {% elif latest_status == 'Forwarded' %}
-                  <td class="font-weight-bold text-success">{{ latest_status|upper }}</td>
+                  <tr>
+                    <th scope="row">Status :</th>
+                    <td class="font-weight-bold text-primary">{{ latest_status|upper }}</td>
+                  </tr>
+                      {% if request.user == complaint.complainant %}
+                      <tr>
+                        <td>
+                          <button class="btn text-light btn-sm btn-secondary shadow">
+                            <a href="{% url 'complaints:update_complaint' complaint.pk %}"
+                              class="nav-link text-light"
+                              >Update</a>
+                          </button>
+                        </td>
+                      </tr>
+                      {% endif %}
                   {% elif latest_status == 'Closed' %}
-                  <td class="font-weight-bold text-danger">{{ latest_status|upper }} <i class="fa fa-ban mx-2"></i></td>
+                    <tr>
+                      <th scope="row">Status :</th>
+                      <td class="font-weight-bold text-danger">C L<i class="fa fa-ban m-1"></i>S E D</td>
+                    </tr>
                   {% endif %}
                 </tr>
               </tbody>
@@ -71,12 +101,27 @@
               <li class="list-group-item m-1 bg-light border-secondary rounded active">
                 <small>
                 <div class="row justify-content-between">
-                  <div class="col-sm-11 text-dark font-weight-bold">
-                    Remark By: {{ remark.respondent }}
+                  <div class="col-sm-9 text-dark font-weight-bold">
+                    Remark By: {{ remark.respondent|capfirst }}
                   </div>
                   <div class="col-sm-1">
                     <a title="view details" hx-get="{% url 'complaints:view_remark_details' remark.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
                   </div>
+                  {% if request.user == remark.respondent and latest_status != "Closed" %}
+                  <div class="col-sm-1">
+                    <a title="Edit" href="{% url 'complaints:remark_update' remark.pk %}"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                  </div>
+                  <div class="col-sm-1">
+                    <form action="{% url 'complaints:delete_remark' remark.pk %}" method="POST">
+                      {% csrf_token %}
+                        <abbr class="col-sm-2" title="delete Remark">
+                          <button type="submit" class="btn btn-white btn-sm">
+                            <i class="fa fa-remove" style="font-size:20px; color:red"></i>
+                          </button>
+                        </abbr>
+                    </form>
+                  </div>
+                  {% endif %}
                 </div>
                 </small>
               </li>
@@ -91,10 +136,7 @@
               <button class="btn text-dark shadow btn-secondary btn-sm my-2">
                 <a href="{% url 'complaints:add_remark' complaint_id=complaint.pk %}" class="nav-link text-light">Add Remark</a>
               </button>
-          {% else %}
-              <p class="my-2 text-danger list-unstyled font-weight-bold pb-5 text-center text-uppercase"><i class="fa fa-ban fa-2x mx-2"></i> NOTE: This complaint is resolved and closed, no further remarks can be added <i class="fa fa-ban fa-2x mx-2"></i></p>
           {% endif %}
-        
         </div>
 
       </div>

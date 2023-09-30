@@ -288,6 +288,25 @@ class AddComplaintForm(forms.ModelForm):
         ]
 
 
+class UpdateComplaintForm(forms.ModelForm):
+    title = forms.CharField(
+        label="title", 
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    description = forms.CharField(
+        label="description",
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = Complaint
+        fields = [
+            "title",
+            "description",
+        ]
+
+
 class AddRemarkForm(forms.ModelForm):
     complaint = forms.ModelChoiceField(
         queryset=Complaint.objects.all(),
@@ -357,3 +376,46 @@ class AddRemarkForm(forms.ModelForm):
             "remark_targeted_personnel",
             "status",
         ]
+
+
+class UpdateRemarkForm(forms.ModelForm):
+    content = forms.CharField(
+        label="description", widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+
+    remark_targeted_personnel = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="Forward / respond to",
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    remark_targeted_department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        required=True,
+        label="Department",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    STATUS_CHOICES = (
+        ("Forwarded", "Forwarded"),
+        ("Closed", "Closed"),
+    )
+
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        label="status",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = Remark
+        fields = [
+            "content",
+            "remark_targeted_department",
+            "remark_targeted_personnel",
+            "status",
+        ]
+
+
+

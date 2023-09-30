@@ -1,16 +1,10 @@
 {% extends "complaints/base_form.html" %} 
 
 {% block form-content %}
-<h3 class="mb-4">Add Remark</h3>
+<h3 class="mb-4">Update Remark</h3>
 <form method="post" class="signup-form my-5">
   {% csrf_token %}
 
-  <div class="form-group">
-    {{form.complaint.label_tag}} {{ form.complaint }}
-    {% if form.complaint.errors %}
-    <div class="alert alert-danger" role="alert">{{ form.complaint.errors }}</div>
-    {% endif %} 
-  </div>
   <div class="form-group">
     {{form.content.label_tag}} {{ form.content }}
     {% if form.content.errors %}
@@ -64,7 +58,7 @@
     {% endif %} 
   </div>
   <div class="form-group d-flex justify-content-end mt-5">
-    <abbr title="submit">
+    <abbr title="Update">
       <button type="submit" class="btn btn-primary submit">
         <span class="fa fa-check"></span>
       </button>
