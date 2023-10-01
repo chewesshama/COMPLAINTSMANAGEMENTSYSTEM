@@ -45,50 +45,16 @@
           </thead>
           <tbody>
             {% for complaint in complaints %}
-              {% if complaint.targeted_personnel == request.user %}
-                {% if latest_status == 'closed' %}
-                  
-                    <tr class="list-group-item list-group-item-action">
-                      <td>{{complaint.title|upper}} <small>closed</small></td>
-                      <td>{{ complaint.complainant|capfirst }}</td>
-                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
-                      <td>{{ complaint.targeted_department|capfirst }}</td>
-                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
-                    </tr>
-
-                {% else %}
-                  
-                    <tr>
-                      <td>{{complaint.title|upper}}</td>
-                      <td>{{ complaint.complainant|capfirst }}</td>
-                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
-                      <td>{{ complaint.targeted_department|capfirst }}</td>
-                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
-                    </tr>
-                
-                {% endif %}
+              {% if complaint %}
+                <tr>
+                  <td>{{complaint.title|upper}}</td>
+                  <td>{{ complaint.complainant|capfirst }}</td>
+                  <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                  <td>{{ complaint.targeted_department|capfirst }}</td>
+                  <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
+                </tr>
               {% else %}
-                {% if latest_status == 'closed' %}
-                  
-                    <tr>
-                      <td>{{complaint.title|upper}} <small>closed</small></td>
-                      <td>{{ complaint.complainant|capfirst }}</td>
-                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
-                      <td>{{ complaint.targeted_department|capfirst }}</td>
-                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" aria-hidden="true"></i></a></td>
-                    </tr>
-                  
-                {% else %}
-                  
-                    <tr>
-                      <td>{{complaint.title|upper}}</td>
-                      <td>{{ complaint.complainant|capfirst }}</td>
-                      <td>{{ complaint.targeted_personnel|capfirst }}</td>
-                      <td>{{ complaint.targeted_department|capfirst }}</td>
-                      <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
-                    </tr>
-                  
-                {% endif %}
+                  <p class="text-info my-3">There is no any complaint to display!!</p>
               {% endif %}
             {% endfor %}
           </tbody>

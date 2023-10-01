@@ -41,8 +41,8 @@ class User(AbstractUser):
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", default="default_pic.jpg", blank=True, null=True
     )
-    phone_number = models.CharField(max_length=15, blank=True)
-    region = models.CharField(max_length=100, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
     district = models.CharField(
         max_length=100, blank=True, validators=[validate_districts]
     )

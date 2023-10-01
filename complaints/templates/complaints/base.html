@@ -63,7 +63,7 @@
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 	</head>
-	<body>
+	<body hx-headers='{"x-CSRFToken": "{{ CSRF_token }}" }'>
 		{% if request.path == '/' %} {% elif user.is_authenticated %}
 		<!-- ======= Header ======= -->
 		<header id="header" class="d-flex align-items-center">
@@ -213,7 +213,7 @@
 		<div>{% block content %} {% endblock content %}</div>
 		<!--endblock for contents-->
 		<div id="modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-  			<div id="dialog" class="modal-dialog modal-dialog-scrollable">
+  			<div id="dialog" class="modal-dialog modal-dialog-centered">
 				
 			</div>
 		</div>

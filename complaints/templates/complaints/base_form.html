@@ -16,7 +16,9 @@ Complaints management System
 />
 <link rel="stylesheet" href="{% static 'assets/css/login.css' %}" />
 <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
-{% endblock style %} {% block content %}
+{% endblock style %} 
+
+{% block content %}
 
 <section class="ftco-section">
   <div class="container">
@@ -30,12 +32,11 @@ Complaints management System
   </div>
 </section>
 
-<div class="container py-3">
-  {% endblock content %} 
-  {% block js %}
-  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
-  <script src="{% static 'assets/js/popper.js' %}"></script>
-  <script src="{% static 'js/bootstrap.js' %}"></script>
-  <script src="{% static 'assets/js/login.js' %}"></script>
-  {% endblock js %}
-</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<script src="{% static 'assets/js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'assets/js/login.js' %}"></script>
+{% endblock js %}
+

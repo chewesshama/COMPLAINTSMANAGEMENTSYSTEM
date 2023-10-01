@@ -5,7 +5,7 @@ from django.views.generic import (
     ListView,
     DetailView,
     DeleteView,
-    UpdateView
+    UpdateView,
 )
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordChangeView
@@ -90,7 +90,7 @@ class UserLoginView(LoginView):
 class UserRegistrationView(PermissionRequiredMixin, CreateView):
     permission_required = "complaints.add_user"
     model = User
-    template_name = "complaints/user_registration_form.html"
+    template_name = "complaints/user_registration_dialog.html"
 
     def get_form_class(self):
         for group in self.request.user.groups.all():
@@ -157,7 +157,6 @@ def userProfileUpdateView(request, pk):
     user_profile = get_object_or_404(User, pk=pk)
 
     if request.user.username != user_profile.username:
-        messages.error(request, "You are not authorized to edit this profile.")
         return redirect("complaints:profile", pk=request.user.pk)
 
     if request.method == "POST":
@@ -176,7 +175,7 @@ def userProfileUpdateView(request, pk):
         "form": form,
     }
 
-    return render(request, "complaints/user_profile_update.html", context)
+    return render(request, "complaints/user_profile_update_dialog.html", context)
 
 
 class DeleteUserView(PermissionRequiredMixin, DeleteView):
@@ -184,10 +183,23 @@ class DeleteUserView(PermissionRequiredMixin, DeleteView):
     model = User
     success_url = reverse_lazy("complaints:all_users_display")
 
+    def get_object(self, queryset=None):
+        profile = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if user.is_superuser:
+            return profile
+        elif user.groups.filter(name="CEO").exists():
+            return profile
+        elif user.groups.filter(name="HOD").exists() and user == profile.username:
+            return profile
+        else:
+            raise Http404("You are not allowed to delete this user.")
+
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
     form_class = PasswordChangeCustomForm
-    template_name = "complaints/password_change.html"
+    template_name = "complaints/password_change_dialog.html"
     success_url = reverse_lazy("complaints:password_change_done")
 
 
@@ -346,21 +358,43 @@ class DeleteComplaintView(PermissionRequiredMixin, DeleteView):
     model = Complaint
     success_url = reverse_lazy("complaints:user_complaints_display")
 
+    def get_object(self, queryset=None):
+        complaint = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if user == complaint.complainant:
+            return complaint
+        else:
+            raise Http404("You are not allowed to delete this complaint.")
+
 
 class UpdateComplaintView(PermissionRequiredMixin, UpdateView):
-    permission_required = 'complaints.change_complaint'
+    permission_required = "complaints.change_complaint"
     model = Complaint
     form_class = UpdateComplaintForm
-    template_name = 'complaints/update_complaint_form.html'
-    context_object_name = 'complaint'
+    template_name = "complaints/update_complaint_form.html"
+    context_object_name = "complaint"
 
     def get_success_url(self):
-        return reverse_lazy('complaints:complaint_details', kwargs={'pk': self.object.pk})
+        return reverse_lazy(
+            "complaints:complaint_details", kwargs={"pk": self.object.pk}
+        )
+        
+    def get_object(self, queryset=None):
+        complaint = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if (
+            user == complaint.complainant
+        ):
+            return complaint
+        else:
+            raise Http404("You are not allowed to update this complaint.")
 
 
 class UpdateComplaintDoneView(PermissionRequiredMixin, TemplateView):
-    permission_required = 'complaint.change_complaint'
-    template_name = 'complaint/complaint_update_done.html'
+    permission_required = "complaint.change_complaint"
+    template_name = "complaint/complaint_update_done.html"
 
 
 class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
@@ -377,10 +411,18 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
             user == complaint.complainant
             or user == complaint.targeted_personnel
             or user.is_superuser
-            or Remark.objects.filter(complaint=complaint, remark_targeted_personnel=user).exists()
+            or Remark.objects.filter(
+                complaint=complaint, remark_targeted_personnel=user
+            ).exists()
         ):
             return complaint
-        elif user.groups.filter(name='CEO').exists():
+        elif user.groups.filter(name="CEO").exists():
+            return complaint
+        elif user.groups.filter(name="HOD").exists() and (
+            user.departments.first() == complaint.complainant.departments.first()
+            or complaint.complainant.is_superuser
+            or complaint.complainant.groups.filter(name="CEO").exists()
+        ):
             return complaint
         else:
             raise Http404("You are not allowed to view this complaint.")
@@ -470,7 +512,7 @@ def add_complaint(request):
         form = AddComplaintForm()
 
     context = {"form": form}
-    return render(request, "complaints/add_complaint_form.html", context)
+    return render(request, "complaints/add_complaint_dialog.html", context)
 
 
 @login_required
@@ -569,36 +611,77 @@ class RemarkDetailView(LoginRequiredMixin, DetailView):
     template_name = "complaints/remark_details.html"
     context_object_name = "remark"
 
-
-class UpdateRemarkView(PermissionRequiredMixin, UpdateView):
-    permission_required = 'complaints.change_remark'
-    model = Remark
-    form_class = UpdateRemarkForm
-    template_name = 'complaints/update_remark_form.html'
-    context_object_name = 'remark'
-    
     def get_object(self, queryset=None):
         remark = super().get_object(queryset=queryset)
         user = self.request.user
 
         if (
             user == remark.respondent
+            or user == remark.remark_targeted_personnel
+            or user.is_superuser
+            or user == remark.complaint.complainant
+            or user == remark.complaint.targeted_personnel
+        ):
+            return remark
+        elif user.groups.filter(name="CEO").exists():
+            return remark
+        elif user.groups.filter(name="HOD").exists() and (
+            user.departments.first() == remark.respondent.departments.first()
+            or remark.respondent.is_superuser
+            or remark.respondent.groups.filter(name="CEO").exists()
+        ):
+            return remark
+        elif user.groups.filter(name="HOD").exists() and (
+            user.departments.first() == remark.complaint.complainant.departments.first()
+            or remark.complaint.complainant.is_superuser
+            or remark.complaint.complainant.groups.filter(name="CEO").exists()
         ):
             return remark
         else:
+            print("You are not allowed to view this remark.")
             raise Http404("You are not allowed to view this remark.")
 
+
+class UpdateRemarkView(PermissionRequiredMixin, UpdateView):
+    permission_required = "complaints.change_remark"
+    model = Remark
+    form_class = UpdateRemarkForm
+    template_name = "complaints/update_remark_form.html"
+    context_object_name = "remark"
+
+    def get_object(self, queryset=None):
+        remark = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if user == remark.respondent:
+            return remark
+        else:
+            raise Http404("You are not allowed to update this remark.")
+
     def get_success_url(self):
-        return reverse_lazy('complaints:complaint_details', kwargs={'pk': self.object.pk})
+        return reverse_lazy(
+            "complaints:complaint_details", kwargs={"pk": self.object.complaint.pk}
+        )
 
 
 class DeleteRemarkView(PermissionRequiredMixin, DeleteView):
     permission_required = "complaints.delete_remark"
     model = Remark
 
+    def get_object(self, queryset=None):
+        remark = super().get_object(queryset=queryset)
+        user = self.request.user
+
+        if user == remark.respondent:
+            return remark
+        else:
+            raise Http404("You are not allowed to delete this remark.")
+
+
     def get_success_url(self):
-            complaint = self.object.complaint 
-            return reverse_lazy('complaints:complaint_details', kwargs={'pk': complaint.pk})
+        complaint = self.object.complaint
+        return reverse_lazy("complaints:complaint_details", kwargs={"pk": complaint.pk})
+
 
 class StaffUserProfileView(PermissionRequiredMixin, DetailView):
     permission_required = "complaints.view_user"

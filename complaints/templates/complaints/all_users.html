@@ -14,10 +14,11 @@
     </nav>
     <div class="row justify-content-between">
       <div class="col-sm-9 d-flex">
-        <abbr title="Add User">
+        <abbr title="Add User" style="cursor: pointer;">
           <a
-            href="{% url 'complaints:register' %}"
+            hx-get="{% url 'complaints:register' %}"
             class="nav-link text-light"
+            hx-target="#dialog"
             >
           <button type="button" class="btn btn-secondary rounded submit shadow-sm">
             <span class="fa fa-plus"></span>
@@ -126,12 +127,14 @@
                 <td>
                   {% if user.username != request.user.username %}
                     <button type="button" class="btn btn-white m-1 btn-sm">
-                      <a hx-get="{% url 'complaints:staff_user_profile' user.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="font-size:20px; color:#6c757d"></i></a>
+                      <a hx-get="{% url 'complaints:staff_user_profile' user.pk %}" hx-target="#dialog" title="View Profile"><i class="fa fa-eye" style="font-size:20px; color:#6c757d"></i></a>
                     </button>
                 </td>
                 <td>
                     <button type="submit" class="btn btn-white m-1 btn-sm">
-                      <i class="fa fa-remove" style="font-size:20px; color:red"></i>
+                      <abbr title="Delete Profile">
+                        <i class="fa fa-remove" style="font-size:20px; color:red; cursor: pointer;"></i>
+                      </abbr>
                     </button>
                   {% endif %}
                 </td>

@@ -1,0 +1,97 @@
+{% extends "complaints/dialog.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block dialog-content %}
+
+<div class="modal-content border shadow">
+    <small>
+        <div class="modal-header border shadow">
+            <h3 class="modal-title">Add Complaint</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body content-section border shadow">
+
+            <form method="post" class="signup-form" action="{% url 'complaints:add_complaint' %}">
+            {% csrf_token %}
+            <div class="form-group my-3">
+                {{form.title.label_tag}} 
+                {{ form.title }}
+                {% if form.title.errors %}
+                <div class="alert alert-danger" role="alert">{{ form.title.errors }}</div>
+                {% endif %} 
+            </div>
+            <div class="form-group my-3">
+                {{form.complainant.label_tag}} 
+                {{ form.complainant }}
+                {% if form.complainant.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ form.complainant.errors }}
+                </div>
+                {% endif %} 
+            </div>
+            <div class="form-group my-3">
+                
+                {{form.description.label_tag}} 
+                {{ form.description }}
+                {% if form.description.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ form.description.errors }}
+                </div>
+                {% endif %} 
+            </div>
+            <div class="form-group my-3">
+                {{ form.attachment_type.label_tag }}
+                {{ form.attachment_type }}
+                {% if form.attachment_type.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form.attachment_type.errors }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group my-3">
+                {{form.attachments.label_tag}} 
+                {{ form.attachments }}
+                {% if form.attachments.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ form.attachments.errors }}
+                </div>
+                {% endif %} 
+            </div>
+            <div class="form-group my-3">
+                {{form.targeted_department.label_tag}} 
+                {{form.targeted_department }}
+                {% if form.targeted_department.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ form.targeted_department.errors }}
+                </div>
+                {% endif %} 
+            </div>
+            <div class="form-group my-3">
+                {{form.targeted_personnel.label_tag}} 
+                {{ form.targeted_personnel}}
+                {% if form.targeted_personnel.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ form.targeted_personnel.errors }}
+                </div>
+                {% endif %}
+            </div>            
+        </div>
+        <div class="modal-footer py-5">
+            <div class="form-group d-flex justify-content-end mb-3">
+                <abbr title="submit">
+                <button type="submit" class="btn btn-primary submit" style="background-color: #e32249 !important; border: solid #e32249 !important;">
+                    <span class="fa fa-user-plus"></span>
+                </button>
+                </abbr>
+            </div>
+            <div class="form-group d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #e32249 !important; border: solid #e32249 !important;">Close</button>
+            </div>
+            </form>
+        </div>
+    </small>
+</div>
+
+{% endblock dialog-content %}

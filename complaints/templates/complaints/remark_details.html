@@ -7,6 +7,7 @@
     <small>
     <div class="modal-header border shadow">
         <h5 class="modal-title" id="exampleModalLongTitle">{{ remark.complaint|upper }} <small>( {{remark.respondent}}'s remark )</small></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body border shadow">
         <table class="table table-borderless">
@@ -31,14 +32,26 @@
                     <th class="row">Targeted Personnel :</th>
                     <td>{{ remark.remark_targeted_personnel }}</td>
                 </tr>
+                {% if remark.status == 'Opened' %}
                 <tr>
-                    <th class="row">Status :</th>
-                    <td class="text-success">{{ remark.status }}</td>
+                    <th scope="row">Status :</th>
+                    <td class="text-success">{{ remark.status|upper }}</td>
                 </tr>
+                {% elif remark.status == 'Forwarded' %}
+                <tr>
+                    <th scope="row">Status :</th>
+                    <td class="text-primary">{{ remark.status|upper }}</td>
+                </tr>
+                {% elif remark.status == 'Closed' %}
+                <tr>
+                    <th scope="row">Status :</th>
+                    <td class="text-danger">C L<i class="fa fa-ban m-1"></i>S E D</td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
-    <div class="modal-footer pb-5">
+    <div class="modal-footer py-5">
         <div class="form-group d-flex justify-content-end mb-3">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>

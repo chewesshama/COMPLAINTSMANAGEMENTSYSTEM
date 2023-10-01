@@ -9,8 +9,10 @@ Complaints management System
 <section id="hero">
   <div class="hero-container">
     <a
-      href="{% url 'complaints:add_complaint' %}"
+      hx-get="{% url 'complaints:add_complaint' %}"
+      hx-target="#dialog"
       class="btn-get-started scrollto shadow-lg rounded"
+      style="cursor: pointer;"
       >Add Complaint Here</a
     >
   </div>

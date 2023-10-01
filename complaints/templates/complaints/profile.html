@@ -81,7 +81,7 @@ Profile Page For CMS User
     <div class="row mt-5 justify-content-between border shadow p-4">
       <div class="col-sm-2">
         <button class="btn text-light btn-sm btn-secondary shadow">
-          <a href="{% url 'complaints:profile_update' user.pk %}"
+          <a hx-get="{% url 'complaints:profile_update' user.pk %}" hx-target="#dialog"
             class="nav-link text-light"
             >Update</a>
         </button>
@@ -89,7 +89,8 @@ Profile Page For CMS User
       <div class="col-sm-3">
         <button class="btn text-light btn-sm btn-secondary shadow">
           <a
-            href="{% url 'complaints:password_change' %}"
+            hx-get="{% url 'complaints:password_change' %}"
+            hx-target="#dialog"
             class="nav-link text-light"
             >Change Password</a
           >

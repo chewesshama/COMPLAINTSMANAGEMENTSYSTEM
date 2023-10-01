@@ -11,8 +11,10 @@
           <div class="col-sm-4 d-flex">
             <abbr title="add complaint">
               <a
-                href="{% url 'complaints:add_complaint' %}"
+                hx-get="{% url 'complaints:add_complaint' %}"
+                hx-target="#dialog"
                 class="nav-link text-light"
+                style="cursor: pointer;"
                 >
               <button type="button" class="btn btn-secondary rounded submit shadow-sm">
                 <span class="fa fa-plus"></span>
@@ -49,18 +51,17 @@
         </thead>
         <tbody>
         {% for complaint in complaints %} 
-        {% if complaint %}
-            <tr>
-              <td>{{complaint.title|upper}}</td>
-              <td>{{ complaint.complainant|capfirst }}</td>
-              <td>{{ complaint.targeted_personnel|capfirst }}</td>
-              <td>{{ complaint.targeted_department|capfirst }}</td>
-              <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
-            </tr>
-          
-        {% else %}
-          <p class="text-info my-3">you have no any complaint to display!!</p>
-        {% endif %}
+          {% if complaint %}
+              <tr>
+                <td>{{complaint.title|upper}}</td>
+                <td>{{ complaint.complainant|capfirst }}</td>
+                <td>{{ complaint.targeted_personnel|capfirst }}</td>
+                <td>{{ complaint.targeted_department|capfirst }}</td>
+                <td><a title="view details" href="{% url 'complaints:complaint_details' complaint.pk %}"><i class="fa fa-eye" style="color: #6c757d;" aria-hidden="true"></i></a></td>
+              </tr>
+          {% else %}
+            <p class="text-info my-3">You have no any complaint to display!!</p>
+          {% endif %}
         {% endfor %}
         </tbody>
       </table>

@@ -104,24 +104,24 @@
                   <div class="col-sm-9 text-dark font-weight-bold">
                     Remark By: {{ remark.respondent|capfirst }}
                   </div>
-                  <div class="col-sm-1">
-                    <a title="view details" hx-get="{% url 'complaints:view_remark_details' remark.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
-                  </div>
                   {% if request.user == remark.respondent and latest_status != "Closed" %}
-                  <div class="col-sm-1">
-                    <a title="Edit" href="{% url 'complaints:remark_update' remark.pk %}"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
-                  </div>
-                  <div class="col-sm-1">
+                  <div class="col-sm-1 justify-content-center ">
                     <form action="{% url 'complaints:delete_remark' remark.pk %}" method="POST">
                       {% csrf_token %}
-                        <abbr class="col-sm-2" title="delete Remark">
-                          <button type="submit" class="btn btn-white btn-sm">
+                        <abbr title="delete Remark">
+                          <button type="submit" class="btn btn-white btn-sm p-0">
                             <i class="fa fa-remove" style="font-size:20px; color:red"></i>
                           </button>
                         </abbr>
                     </form>
                   </div>
+                  <div class="col-sm-1">
+                    <a title="Edit" href="{% url 'complaints:remark_update' remark.pk %}"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                  </div>
                   {% endif %}
+                  <div class="col-sm-1">
+                    <a title="view details" hx-get="{% url 'complaints:view_remark_details' remark.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                  </div>
                 </div>
                 </small>
               </li>
