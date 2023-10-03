@@ -143,7 +143,6 @@ class UserRegistrationView(PermissionRequiredMixin, CreateView):
         messages.success(self.request, "User registered successfully.")
         return redirect("complaints:register_done")
 
-
 class UserRegistrationDoneView(PermissionRequiredMixin, TemplateView):
     permission_required = "complaints.add_user"
     template_name = "complaints/user_register_done.html"

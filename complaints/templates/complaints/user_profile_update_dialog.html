@@ -14,7 +14,7 @@
         </div>
         <div class="modal-body content-section border shadow">
 
-            <form method="post" class="signup-form" action="{% url 'complaints:profile_update' user.pk %}">
+            <form method="post" enctype="multipart/form-data" class="signup-form" action="{% url 'complaints:profile_update' user.pk %}">
             {% csrf_token %}
             {% if user.profile_picture %} 
               <img src="{{ user.profile_picture.url }}"

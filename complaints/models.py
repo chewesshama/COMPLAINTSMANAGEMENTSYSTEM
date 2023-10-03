@@ -21,13 +21,6 @@ STATUS_CHOICES = (
 
 
 class User(AbstractUser):
-#    def validate_districts(value):
-#        for district in districts:
-#            if district["name"] == value:
-#                return
-#
-#        raise ValidationError("The district is not known")
-
     departments = models.ForeignKey(Department, on_delete=models.DO_NOTHING, related_name="user_department", null=True)
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", default="default_pic.jpg", blank=True, null=True
