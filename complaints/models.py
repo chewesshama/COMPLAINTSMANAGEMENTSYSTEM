@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -12,16 +13,6 @@ class Department(models.Model):
         return self.name
 
 
-class ComplaintAttachments(models.Model):
-    picture = models.ImageField(upload_to="complaint_pictures", null=True, blank=True)
-    video = models.FileField(upload_to="complaint_videos", blank=True, null=True)
-    voice = models.FileField(upload_to="complaint_voices", blank=True, null=True)
-    file = models.FileField(upload_to="complaint_files", blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.picture.url}"
-
-
 STATUS_CHOICES = (
     ("Opened", "Opened"),
     ("Forwarded", "Forwarded"),
@@ -30,21 +21,21 @@ STATUS_CHOICES = (
 
 
 class User(AbstractUser):
-    def validate_districts(value):
-        for district in districts:
-            if district["name"] == value:
-                return
+#    def validate_districts(value):
+#        for district in districts:
+#            if district["name"] == value:
+#                return
+#
+#        raise ValidationError("The district is not known")
 
-        raise ValidationError("The district is not known")
-
-    departments = models.ManyToManyField(Department, blank=True)
+    departments = models.ForeignKey(Department, on_delete=models.DO_NOTHING, related_name="user_department", null=True)
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", default="default_pic.jpg", blank=True, null=True
     )
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     region = models.CharField(max_length=100, blank=True, null=True)
     district = models.CharField(
-        max_length=100, blank=True, validators=[validate_districts]
+        max_length=100, blank=True
     )
 
     def save(self, *args, **kwargs):
@@ -52,6 +43,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class ComplaintAttachments(models.Model):
+    file = models.FileField(upload_to='complaint_pictures/', null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    content_type = models.CharField(max_length=100, null=True, blank=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    uploaded_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.picture.url}"
+
 
 
 class Complaint(models.Model):

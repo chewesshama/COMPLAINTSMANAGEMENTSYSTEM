@@ -51,3 +51,4 @@ admin.site.register(DepartmentHistory)
 
 admin.site.site_header = "CMS admin area"
 admin.site.site_title = "CMS admin site"
+admin.site.site_url = 'http://127.0.0.1:8000/home/'

@@ -10,15 +10,15 @@ from django.views.generic import (
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.contrib.auth.models import Group
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import IntegerField
 from django.db.models import Case, When, Value, CharField
 from django.db.models import Q, Subquery
 from django.urls import reverse, reverse_lazy
-from django.http import JsonResponse, Http404
+from django.http import HttpResponseForbidden, JsonResponse, Http404
 from mtaa import tanzania
-from .models import Complaint, Remark, User, ComplaintAttachments
+from .models import Complaint, Department, Remark, User, ComplaintAttachments
 from .forms import (
     UserProfileForm,
     CEORegistrationForm,
@@ -31,21 +31,33 @@ from .forms import (
     AddRemarkForm,
     UpdateRemarkForm,
 )
-from django.db import transaction
+from django.core.exceptions import PermissionDenied
 
 
-def get_districts(request):
-    region_name = request.GET.get("region_name")
+# def get_department(request):
+#    departments = Department.objects.all()
+#    context = {"departments": departments}
+#    return render(request, "complaints/add_remark.html", context)
+#
+#
+# def get_users(request):
+#    department = request.GET.get('department')
+#    users = User.objects.get(department=department)
+#    context = {"users": users}
+#    return render(request, "complaints/department_members_options.html", context)
 
-    if hasattr(tanzania, region_name):
-        region = getattr(tanzania, region_name)
 
-        if hasattr(region, "districts"):
-            districts = region.districts
-            district_names = [district for district in districts]
-            return JsonResponse(district_names, safe=False)
-
-    return JsonResponse([], safe=False)
+# def get_districts(request):
+#    region_name = request.GET.get("region_name")
+#
+#    if hasattr(tanzania, region_name):
+#
+#        if hasattr(region, "districts"):
+#            districts = region.districts
+#            district_names = [district for district in districts]
+#            return JsonResponse(district_names, safe=False)
+#
+#    return JsonResponse([], safe=False)
 
 
 def custom_404_view(request, exception=None):
@@ -113,7 +125,7 @@ class UserRegistrationView(PermissionRequiredMixin, CreateView):
         user.save()
 
         if user_group and (user_group.name == "CEO" or self.request.user.is_superuser):
-            user.departments.set([department])
+            user.departments = department
             group = form.cleaned_data.get("group")
 
             if group.name == "CEO" or group.name == "HOD":
@@ -124,8 +136,9 @@ class UserRegistrationView(PermissionRequiredMixin, CreateView):
                 add_user_to_group(user, group)
                 user.save()
         elif user_group and user_group.name == "HOD":
-            user.departments.set([self.request.user.departments.first()])
+            user.departments = self.request.user.departments
             user.groups.set([Group.objects.get(name="EMPLOYEE")])
+            user.save()
 
         messages.success(self.request, "User registered successfully.")
         return redirect("complaints:register_done")
@@ -216,6 +229,8 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_search_form"] = SearchForm(self.request.GET)
+        context["groups"] = Group.objects.all()
+        context["departments"] = Department.objects.all()
         return context
 
     def get_queryset(self):
@@ -233,7 +248,7 @@ class AllUserDisplayView(PermissionRequiredMixin, ListView):
         )
 
         if user.groups.filter(name="HOD").exists():
-            department = user.departments.first()
+            department = user.departments
             if department:
                 queryset = queryset.exclude(departments=None)
                 queryset = queryset.filter(Q(departments=department) | Q(pk=user.pk))
@@ -270,12 +285,24 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["user_search_form"] = SearchForm(self.request.GET)
 
+        user_counts = {}
+
         queryset = self.get_queryset()
+        for complaint in queryset:
+            user = complaint.targeted_personnel
+            if user in user_counts:
+                user_counts[user] += 1
+            else:
+                user_counts[user] = 1
 
+        context["user_counts"] = user_counts
+
+        user_with_most_complaints = max(user_counts, key=user_counts.get)
+        context["user_with_most_complaints"] = user_with_most_complaints
+
+        queryset = self.get_queryset()
         complaint = queryset.first()
-
         remarks = complaint.remarks.all() if complaint else []
-
         latest_remark = remarks.last()
         latest_status = (
             latest_remark.status
@@ -287,6 +314,7 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
 
         context["remarks"] = remarks
         context["latest_status"] = latest_status
+
         return context
 
     def get_queryset(self):
@@ -296,7 +324,7 @@ class AllComplaintsDisplayView(PermissionRequiredMixin, ListView):
         if user.groups.filter(name="CEO").exists() or user.is_superuser:
             queryset = Complaint.objects.all()
         elif user.groups.filter(name="HOD").exists():
-            department = user.departments.first()
+            department = user.departments
             if department:
                 queryset = Complaint.objects.filter(targeted_department=department)
             else:
@@ -379,14 +407,12 @@ class UpdateComplaintView(PermissionRequiredMixin, UpdateView):
         return reverse_lazy(
             "complaints:complaint_details", kwargs={"pk": self.object.pk}
         )
-        
+
     def get_object(self, queryset=None):
         complaint = super().get_object(queryset=queryset)
         user = self.request.user
 
-        if (
-            user == complaint.complainant
-        ):
+        if user == complaint.complainant:
             return complaint
         else:
             raise Http404("You are not allowed to update this complaint.")
@@ -419,9 +445,10 @@ class ComplaintDetailsView(PermissionRequiredMixin, DetailView):
         elif user.groups.filter(name="CEO").exists():
             return complaint
         elif user.groups.filter(name="HOD").exists() and (
-            user.departments.first() == complaint.complainant.departments.first()
-            or complaint.complainant.is_superuser
-            or complaint.complainant.groups.filter(name="CEO").exists()
+            user.departments == complaint.targeted_department
+            or Remark.objects.filter(
+                complaint=complaint, remark_targeted_department=user.departments
+            ).exists()
         ):
             return complaint
         else:
@@ -445,56 +472,14 @@ def add_complaint(request):
     if request.method == "POST":
         form = AddComplaintForm(request.POST, request.FILES)
         if form.is_valid():
-            attachment_type = form.cleaned_data["attachment_type"]
             attachments = []
-
-            if attachment_type == "picture":
-                picture = request.FILES.get("picture")
-                if picture:
-                    attachment = ComplaintAttachments(picture=picture)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "voice":
-                voice = request.FILES.get("voice")
-                if voice:
-                    attachment = ComplaintAttachments(voice=voice)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "video":
-                video = request.FILES.get("video")
-                if video:
-                    attachment = ComplaintAttachments(video=video)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "file":
-                file = request.FILES.get("file")
-                if file:
-                    attachment = ComplaintAttachments(file=file)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "all":
-                picture = request.FILES.get("picture")
-                video = request.FILES.get("video")
-                voice = request.FILES.get("voice")
-                file = request.FILES.get("file")
-
-                if picture:
-                    attachment = ComplaintAttachments(picture=picture)
-                    attachment.save()
-                    attachments.append(attachment)
-                if video:
-                    attachment = ComplaintAttachments(video=video)
-                    attachment.save()
-                    attachments.append(attachment)
-                if voice:
-                    attachment = ComplaintAttachments(voice=voice)
-                    attachment.save()
-                    attachments.append(attachment)
-                if file:
-                    attachment = ComplaintAttachments(file=file)
-                    attachment.save()
-                    attachments.append(attachment)
-
+            for attachment in request.FILES.getlist("attachments"):
+                ComplaintAttachments.objects.create(
+                    file=attachment,
+                    description=attachment.name,
+                    content_type=attachment.content_type,
+                    uploaded_by=request.user,
+                )
             complaint = Complaint(
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
@@ -515,89 +500,112 @@ def add_complaint(request):
     return render(request, "complaints/add_complaint_dialog.html", context)
 
 
+def is_authorized_user(user, complaint):
+    if user == complaint.complainant:
+        return True
+
+    if (
+        user.groups.filter(name="HOD").exists()
+        and user.departments == complaint.targeted_department
+    ):
+        return True
+
+    if user.is_superuser or user.groups.filter(name="CEO").exists():
+        return True
+
+    if Remark.objects.filter(complaint=complaint, remark_targeted_personnel=user).exists():
+        return True
+
+    return False
+
+
 @login_required
 def add_remark(request, complaint_id):
     complaint = get_object_or_404(Complaint, pk=complaint_id)
-    if request.method == "POST":
-        form = AddRemarkForm(
-            request.POST, request.FILES, initial={"complaint": complaint}
-        )
-        if form.is_valid():
-            attachment_type = form.cleaned_data["attachment_type"]
-            attachments = []
-
-            if attachment_type == "picture":
-                picture = request.FILES.get("picture")
-                if picture:
-                    attachment = ComplaintAttachments(picture=picture)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "voice":
-                voice = request.FILES.get("voice")
-                if voice:
-                    attachment = ComplaintAttachments(voice=voice)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "video":
-                video = request.FILES.get("video")
-                if video:
-                    attachment = ComplaintAttachments(video=video)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "file":
-                file = request.FILES.get("file")
-                if file:
-                    attachment = ComplaintAttachments(file=file)
-                    attachment.save()
-                    attachments.append(attachment)
-            elif attachment_type == "all":
-                picture = request.FILES.get("picture")
-                video = request.FILES.get("video")
-                voice = request.FILES.get("voice")
-                file = request.FILES.get("file")
-
-                if picture:
-                    attachment = ComplaintAttachments(picture=picture)
-                    attachment.save()
-                    attachments.append(attachment)
-                if video:
-                    attachment = ComplaintAttachments(video=video)
-                    attachment.save()
-                    attachments.append(attachment)
-                if voice:
-                    attachment = ComplaintAttachments(voice=voice)
-                    attachment.save()
-                    attachments.append(attachment)
-                if file:
-                    attachment = ComplaintAttachments(file=file)
-                    attachment.save()
-                    attachments.append(attachment)
-
-            remark = Remark(
-                complaint=form.cleaned_data["complaint"],
-                content=form.cleaned_data["content"],
-                respondent=request.user,
-                remark_targeted_department=form.cleaned_data[
-                    "remark_targeted_department"
-                ],
-                remark_targeted_personnel=form.cleaned_data[
-                    "remark_targeted_personnel"
-                ],
-                status=form.cleaned_data["status"],
+    if is_authorized_user(request.user, complaint):
+        if request.method == "POST":
+            form = AddRemarkForm(
+                request.POST, request.FILES, initial={"complaint": complaint}
             )
+            if form.is_valid():
+                attachment_type = form.cleaned_data["attachment_type"]
+                attachments = []
 
-            remark.save()
-            remark.attachments.set(attachments)
+                if attachment_type == "picture":
+                    picture = request.FILES.get("picture")
+                    if picture:
+                        attachment = ComplaintAttachments(picture=picture)
+                        attachment.save()
+                        attachments.append(attachment)
+                elif attachment_type == "voice":
+                    voice = request.FILES.get("voice")
+                    if voice:
+                        attachment = ComplaintAttachments(voice=voice)
+                        attachment.save()
+                        attachments.append(attachment)
+                elif attachment_type == "video":
+                    video = request.FILES.get("video")
+                    if video:
+                        attachment = ComplaintAttachments(video=video)
+                        attachment.save()
+                        attachments.append(attachment)
+                elif attachment_type == "file":
+                    file = request.FILES.get("file")
+                    if file:
+                        attachment = ComplaintAttachments(file=file)
+                        attachment.save()
+                        attachments.append(attachment)
+                elif attachment_type == "all":
+                    picture = request.FILES.get("picture")
+                    video = request.FILES.get("video")
+                    voice = request.FILES.get("voice")
+                    file = request.FILES.get("file")
 
-            complaint = form.cleaned_data["complaint"]
+                    if picture:
+                        attachment = ComplaintAttachments(picture=picture)
+                        attachment.save()
+                        attachments.append(attachment)
+                    if video:
+                        attachment = ComplaintAttachments(video=video)
+                        attachment.save()
+                        attachments.append(attachment)
+                    if voice:
+                        attachment = ComplaintAttachments(voice=voice)
+                        attachment.save()
+                        attachments.append(attachment)
+                    if file:
+                        attachment = ComplaintAttachments(file=file)
+                        attachment.save()
+                        attachments.append(attachment)
 
-            url = reverse("complaints:remark_added_done", args=[complaint.pk])
-            return redirect(url)
+                remark = Remark(
+                    complaint=form.cleaned_data["complaint"],
+                    content=form.cleaned_data["content"],
+                    respondent=request.user,
+                    remark_targeted_department=form.cleaned_data[
+                        "remark_targeted_department"
+                    ],
+                    remark_targeted_personnel=form.cleaned_data[
+                        "remark_targeted_personnel"
+                    ],
+                    status=form.cleaned_data["status"],
+                )
+
+                remark.save()
+                remark.attachments.set(attachments)
+
+                complaint = form.cleaned_data["complaint"]
+
+                url = reverse("complaints:remark_added_done", args=[complaint.pk])
+                return redirect(url)
+        else:
+            form = AddRemarkForm(initial={"complaint": complaint})
+
+        context = {"form": form}
+        return render(request, "complaints/add_remark.html", context)
+
     else:
-        form = AddRemarkForm(initial={"complaint": complaint})
-
-    context = {"form": form}
-    return render(request, "complaints/add_remark.html", context)
+        return render(request, 'error_templates/403.html', status=403)
 
 
 class RemarkAddedDone(LoginRequiredMixin, DetailView):
@@ -626,13 +634,13 @@ class RemarkDetailView(LoginRequiredMixin, DetailView):
         elif user.groups.filter(name="CEO").exists():
             return remark
         elif user.groups.filter(name="HOD").exists() and (
-            user.departments.first() == remark.respondent.departments.first()
+            user.departments == remark.respondent.departments
             or remark.respondent.is_superuser
             or remark.respondent.groups.filter(name="CEO").exists()
         ):
             return remark
         elif user.groups.filter(name="HOD").exists() and (
-            user.departments.first() == remark.complaint.complainant.departments.first()
+            user.departments == remark.complaint.complainant.departments
             or remark.complaint.complainant.is_superuser
             or remark.complaint.complainant.groups.filter(name="CEO").exists()
         ):
@@ -677,10 +685,19 @@ class DeleteRemarkView(PermissionRequiredMixin, DeleteView):
         else:
             raise Http404("You are not allowed to delete this remark.")
 
-
     def get_success_url(self):
         complaint = self.object.complaint
         return reverse_lazy("complaints:complaint_details", kwargs={"pk": complaint.pk})
+
+
+def has_special_permission(user):
+    if (
+        user.is_superuser
+        or user.groups.filter(name="CEO").exists()
+        or user.groups.filter(name="HOD").exists()
+    ):
+        return True
+    return False
 
 
 class StaffUserProfileView(PermissionRequiredMixin, DetailView):
@@ -688,3 +705,8 @@ class StaffUserProfileView(PermissionRequiredMixin, DetailView):
     model = User
     template_name = "complaints/users_profile.html"
     context_object_name = "user"
+
+    def get(self, request, *args, **kwargs):
+        if not has_special_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)

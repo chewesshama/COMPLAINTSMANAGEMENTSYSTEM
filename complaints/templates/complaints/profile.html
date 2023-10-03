@@ -8,14 +8,19 @@ Profile Page For CMS User
 
 {% block content %}
 
-<div class="conent-section container py-5">
-  <div class="media">
-    <div class="border shadow p-4">
-      {% if user.profile_picture %} <img src="{{ user.profile_picture.url }}"
-      class="rounded-circle account-img"" style="height: 100px; width: 100px;"
-      alt="{{ user.username }}'s Profile Image"> {% else %} <img src="{% static
-      'default_pic.png' %}" class="rounded-circle account-img"" style="height:
-      100px; width: 100px;" alt="Default Profile Image"> {% endif %}
+<div class="conent-section align-items-center container p-5">
+  <div class="container row row align-items-center justify-content-between pt-3">
+    <div class="col-3">
+      <abbr title="{{ user.username }}" style="cursor: pointer;">
+      {% if user.profile_picture %} 
+        <img src="{{ user.profile_picture.url }}"
+          class="rounded img-fluid account-img"" 
+          style="width: 300px; height: 300px;"
+          alt="{{ user.username }}'s Profile Image">  
+      {% endif %}
+      </abbr>
+    </div>
+    <div class="border shadow p-4 col-8">
       <div class="media-body">
         <h2 class="account-heading my-2">
           {{user.first_name|upper}} {{user.last_name|upper}}
@@ -61,14 +66,8 @@ Profile Page For CMS User
             {% if not user|has_group:'CEO' and not user.is_superuser %}
             <tr>
               <th scope="row">Department :</th>
-              {% if user.departments.all %} 
-                {% for department in user.departments.all %} 
-                  {% if department.name %}
-                    <td>{{ department.name|capfirst }}</td>
-                  {% else %}
-                    <td>-- Not Set --</td>
-                  {% endif %} 
-                {% endfor %} 
+              {% if user.departments %}
+                    <td>{{ user.departments|capfirst }}</td>
               {% else %}
                 <td>-- Not Set --</td>
               {% endif %} 
@@ -77,26 +76,27 @@ Profile Page For CMS User
           </tbody>
         </table>
       </div>
+          <div class="row mt-5 justify-content-between p-4">
+            <div class="col-sm-2">
+              <button class="btn text-light btn-sm btn-secondary">
+                <a hx-get="{% url 'complaints:profile_update' user.pk %}" hx-target="#dialog"
+                  class="nav-link text-light"
+                  >Update</a>
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button class="btn text-light btn-sm btn-secondary">
+                <a
+                  hx-get="{% url 'complaints:password_change' %}"
+                  hx-target="#dialog"
+                  class="nav-link text-light"
+                  >Change Password</a
+                >
+              </button>
+            </div>
+          </div>
     </div>
-    <div class="row mt-5 justify-content-between border shadow p-4">
-      <div class="col-sm-2">
-        <button class="btn text-light btn-sm btn-secondary shadow">
-          <a hx-get="{% url 'complaints:profile_update' user.pk %}" hx-target="#dialog"
-            class="nav-link text-light"
-            >Update</a>
-        </button>
-      </div>
-      <div class="col-sm-3">
-        <button class="btn text-light btn-sm btn-secondary shadow">
-          <a
-            hx-get="{% url 'complaints:password_change' %}"
-            hx-target="#dialog"
-            class="nav-link text-light"
-            >Change Password</a
-          >
-        </button>
-      </div>
-    </div>
+
   </div>
 </div>
 

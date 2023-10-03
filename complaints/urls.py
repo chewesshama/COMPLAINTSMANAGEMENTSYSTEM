@@ -26,7 +26,9 @@ from .views import (
     userProfileUpdateView,
     add_complaint,
     add_remark,
-    get_districts,
+    #get_districts,
+    #get_department,
+    #get_users,
 )
 
 
@@ -71,7 +73,9 @@ urlpatterns = [
     path("remark_update/<int:pk>/", UpdateRemarkView.as_view(), name="remark_update"),
     path("delete_remark/<int:pk>/", DeleteRemarkView.as_view(), name="delete_remark"),
     path('remark/<int:pk>/', RemarkDetailView.as_view(), name='view_remark_details'),
-    path("get_districts/", get_districts, name="get_districts"),
+    #path("get_districts/", get_districts, name="get_districts"),
+    #path("get_department_users/", get_users, name="get_users"),
+    #path("get_departments/", get_department, name="get_department"),
 ]
 
 handler404 = "complaints.views.custom_404_view"

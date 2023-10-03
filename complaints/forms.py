@@ -10,13 +10,9 @@ from mtaa import tanzania, districts
 
 
 class CEORegistrationForm(UserCreationForm):
-    first_name = forms.CharField(
-        label="firstname", widget=forms.TextInput
-    )
+    first_name = forms.CharField(label="firstname", widget=forms.TextInput)
 
-    last_name = forms.CharField(
-        label="lastname", widget=forms.TextInput
-    )
+    last_name = forms.CharField(label="lastname", widget=forms.TextInput)
 
     username = forms.CharField(
         label="username", widget=forms.TextInput(attrs={"class": "form-control"})
@@ -114,7 +110,7 @@ class LoginForm(AuthenticationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    REGION_CHOICES = [(region, region) for region in tanzania]
+    #REGION_CHOICES = [(region, region) for region in tanzania]
 
     first_name = forms.CharField(
         label="firstname", widget=forms.TextInput(attrs={"class": "form-control"})
@@ -136,41 +132,39 @@ class UserProfileForm(forms.ModelForm):
         widget=forms.ClearableFileInput(attrs={"class": "form-control"})
     )
 
-    region = forms.ChoiceField(
+    region = forms.CharField(
         label="Region",
-        choices=[(region, region) for region in tanzania],
+        #choices=[(region, region) for region in tanzania],
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
-    district = forms.ChoiceField(
+    district = forms.CharField(
         label="District",
-        choices=[(district, district) for district in districts],
-        validators=[],
+        #choices=[(district, district) for district in districts],
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
-    def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
-
-        self.fields["region"].choices = [("", "Select a Region")] + [
-            (region, region) for region in tanzania
-        ]
-
-        if "instance" in kwargs and kwargs["instance"]:
-            instance = kwargs["instance"]
-            if instance.region:
-                selected_region = instance.region
-                if hasattr(tanzania, selected_region):
-                    region = getattr(tanzania, selected_region)
-                    if hasattr(region, "districts"):
-                        districts = [
-                            (district, district) for district in region.districts
-                        ]
-                        self.fields["district"].choices = [
-                            ("", "Select a District")
-                        ] + districts
+#    def __init__(self, *args, **kwargs):
+#        super(UserProfileForm, self).__init__(*args, **kwargs)
+#
+#        self.fields["region"].choices = [("", "Select a Region")] + [
+#            (region, region) for region in tanzania
+#        ]
+#
+#        if "instance" in kwargs and kwargs["instance"]:
+#            instance = kwargs["instance"]
+#            if instance.region:
+#                selected_region = instance.region
+#                if hasattr(tanzania, selected_region):
+#                    if hasattr(region, "districts"):
+#                        districts = [
+#                            (district, district) for district in region.districts
+#                        ]
+#                        self.fields["district"].choices = [
+#                            ("", "Select a District")
+#                        ] + districts
 
     phone_number = forms.CharField(
         label="phone number", widget=forms.TextInput(attrs={"class": "form-control"})
@@ -226,7 +220,7 @@ class MultiFileField(forms.FileField):
 
 class AddComplaintForm(forms.ModelForm):
     title = forms.CharField(
-        label="title", 
+        label="title",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
@@ -235,25 +229,10 @@ class AddComplaintForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control"}),
     )
 
-    ATTACHMENT_CHOICES = [
-        ("picture", "Picture"),
-        ("voice", "Voice"),
-        ("video", "Video"),
-        ("file", "File"),
-        ("all", "All"),
-    ]
-
-    attachment_type = forms.ChoiceField(
-        choices=ATTACHMENT_CHOICES,
-        label="Attachment Type",
-        required=True,
-        widget=forms.Select(attrs={"class": "form-control"}),
-    )
-
-    attachments = MultiFileField(
+    attachments = forms.FileField(
         required=False,
         widget=forms.ClearableFileInput(
-            attrs={"multiple": True, "class": "form-control"}
+            attrs={"class": "form-control"}
         ),
     )
 
@@ -270,6 +249,15 @@ class AddComplaintForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
     )
 
+#    def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
+#
+#        if "targeted_department" in self.data:
+#            department_id = int(self.data.get("targeted_department"))
+#            self.fields["targeted_personnel"].queryset = User.objects.filter(
+#                department_id=department_id
+#            )
+
     STATUS_CHOICES = (
         ("Opened", "Opened"),
         ("Forwarded", "Forwarded"),
@@ -281,16 +269,15 @@ class AddComplaintForm(forms.ModelForm):
         fields = [
             "title",
             "description",
-            "attachment_type",
             "attachments",
             "targeted_department",
-            "targeted_personnel"
+            "targeted_personnel",
         ]
 
 
 class UpdateComplaintForm(forms.ModelForm):
     title = forms.CharField(
-        label="title", 
+        label="title",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
@@ -318,25 +305,10 @@ class AddRemarkForm(forms.ModelForm):
         label="description", widget=forms.Textarea(attrs={"class": "form-control"})
     )
 
-    ATTACHMENT_CHOICES = [
-        ("picture", "Picture"),
-        ("voice", "Voice"),
-        ("video", "Video"),
-        ("file", "File"),
-        ("all", "All"),
-    ]
-
-    attachment_type = forms.ChoiceField(
-        choices=ATTACHMENT_CHOICES,
-        label="Attachment Type",
-        required=True,
-        widget=forms.Select(attrs={"class": "form-control"}),
-    )
-
-    attachments = MultiFileField(
+    attachments = forms.FileField(
         required=False,
         widget=forms.ClearableFileInput(
-            attrs={"multiple": True, "class": "form-control"}
+            attrs={"class": "form-control"}
         ),
     )
 
@@ -370,7 +342,6 @@ class AddRemarkForm(forms.ModelForm):
         fields = [
             "complaint",
             "content",
-            "attachment_type",
             "attachments",
             "remark_targeted_department",
             "remark_targeted_personnel",
@@ -416,6 +387,3 @@ class UpdateRemarkForm(forms.ModelForm):
             "remark_targeted_personnel",
             "status",
         ]
-
-
-

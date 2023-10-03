@@ -1,0 +1,6 @@
+<select name="user">
+    <option selected>Choose the targeted Personnel</option>
+    {% for user in users %}
+      <option value="{{ user.pk }}">{{ user.username }}</option>
+    {% endfor %}
+</select> 

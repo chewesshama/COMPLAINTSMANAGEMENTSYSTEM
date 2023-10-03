@@ -12,10 +12,9 @@
     <div class="modal-body content-section border shadow">
         <div class="media ">
             {% if user.profile_picture %} <img src="{{ user.profile_picture.url }}"
-            class="rounded-circle account-img"" style="height: 100px; width: 100px;"
-            alt="{{ user.username }}'s Profile Image"> {% else %} <img src="{% static
-            'default_pic.png' %}" class="rounded-circle account-img"" style="height:
-            100px; width: 100px;" alt="Default Profile Image"> {% endif %}
+              class="rounded-circle account-img"" style="height: 100px; width: 100px;"
+              alt="{{ user.username }}'s Profile Image">
+            {% endif %}
             <div class="media-body">
             <h2 class="account-heading my-2">
                 {{user.first_name|upper}} {{user.last_name|upper}}
@@ -34,20 +33,16 @@
                       <td>-- Not Set --</td>
                       {% endif %}
                   </tr>
+
                   <tr>
-                      <th scope="row">Department :</th>
-                  {% if user.departments.all %} 
-                    {% for department in user.departments.all %} 
-                      {% if department.name %}
-                        <td>{{ department.name|upper }}</td>
-                      {% else %}
-                        <td>-- Not Set --</td>
-                      {% endif %} 
-                    {% endfor %} 
-                  {% else %}
-                    <td>None</td>
-                  {% endif %} 
+                    <th scope="row">Department :</th>
+                    {% if user.departments %}
+                        <td>{{ user.departments|upper }}</td>
+                    {% else %}
+                      <td>None</td>
+                    {% endif %}
                   </tr>
+
                   <tr>
                   <th scope="row">Position :</th>
                   {% for group in user.groups.all %} 
