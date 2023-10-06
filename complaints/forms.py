@@ -234,21 +234,13 @@ class AddComplaintForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control"}),
     )
 
-    #    attachments = MultiMediaField(
-    #        min_num=1,
-    #        max_num=5,
-    #        max_file_size=1024 * 1024 * 5,
-    #        widget=MultiFileInput(attrs={"accept": "image/*,audio/*,video/*,application/pdf"}),
-    #        label="attachments",
-    #        required=False,
-    #    )
-
     attachments = MultiMediaField(
         min_num=1,
         max_num=5,
         max_file_size=1024 * 1024 * 5,
         media_type="image",  # 'audio', 'video' or 'image'
         widget=forms.ClearableFileInput(attrs={"class": "form-control"}),
+        required=False,
     )
 
     targeted_personnel = forms.ModelChoiceField(
@@ -263,15 +255,6 @@ class AddComplaintForm(forms.ModelForm):
         label="Department",
         widget=forms.Select(attrs={"class": "form-control"}),
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if "targeted_department" in self.data:
-            department_id = int(self.data.get("targeted_department"))
-            self.fields["targeted_personnel"].queryset = User.objects.filter(
-                department_id=department_id
-            )
 
     STATUS_CHOICES = (
         ("Opened", "Opened"),
@@ -326,6 +309,7 @@ class AddRemarkForm(forms.ModelForm):
         max_file_size=1024 * 1024 * 5,
         media_type="image",  # 'audio', 'video' or 'image'
         widget=forms.ClearableFileInput(attrs={"class": "form-control"}),
+        required = False,
     )
 
     remark_targeted_personnel = forms.ModelChoiceField(

@@ -13,7 +13,7 @@
         </div>
         <div class="modal-body content-section border shadow">
 
-            <form method="post" class="signup-form" action="{% url 'complaints:update_complaint' complaint.pk %}">
+            <form method="post" class="signup-form" action="{% url 'complaints:remark_update' remark.pk %}">
             {% csrf_token %}
 
             <div class="form-group">

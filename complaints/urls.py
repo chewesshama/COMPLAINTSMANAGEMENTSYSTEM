@@ -89,7 +89,7 @@ urlpatterns = [
     path("add-complaint/", add_complaint, name="add_complaint"),
     path("add_remark/<int:complaint_id>/", add_remark, name="add_remark"),
     path(
-        "add-remark-done/<int:pk>/", RemarkAddedDone.as_view(), name="remark_added_done"
+        "add-remark-done/", RemarkAddedDone.as_view(), name="remark_added_done"
     ),
     path("remark_update/<int:pk>/", UpdateRemarkView.as_view(), name="remark_update"),
     path("delete_remark/<int:pk>/", DeleteRemarkView.as_view(), name="delete_remark"),

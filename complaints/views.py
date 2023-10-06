@@ -172,18 +172,18 @@ class DeleteUserView(PermissionRequiredMixin, DeleteView):
     template_name = "complaints/user_delete_confirm_dialog.html"
     success_url = reverse_lazy("complaints:all_users_display")
 
-    def get_object(self, queryset=None):
-        profile = super().get_object(queryset=queryset)
-        user = self.request.user
-
-        if user.is_superuser:
-            return profile
-        elif user.groups.filter(name="CEO").exists():
-            return profile
-        elif user.groups.filter(name="HOD").exists() and user == profile.username:
-            return profile
-        else:
-            raise Http404("You are not allowed to delete this user.")
+#    def get_object(self, queryset=None):
+#        profile = super().get_object(queryset=queryset)
+#        user = self.request.user
+#
+#        if user.is_superuser:
+#            return profile
+#        elif user.groups.filter(name="CEO").exists():
+#            return profile
+#        elif user.groups.filter(name="HOD").exists() and user == profile.username:
+#            return profile
+#        else:
+#            raise Http404("You are not allowed to delete this user.")
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
@@ -525,13 +525,10 @@ def add_remark(request, complaint_id):
                     attachment.save()
                     remark.attachments.add(attachment)
 
-                url = reverse("complaints:remark_added_done", args=[complaint.pk])
-                return redirect(url)
+                return redirect('complaints:complaint_details', pk=complaint.pk)
         else:
             form = AddRemarkForm(initial={"complaint": complaint})
 
-#        context = {"form": form}
-#        return render(request, "complaints/add_remark_dialog.html", context)
         context = {"complaint": complaint, "form": form}
         return render(request, "complaints/add_remark_dialog.html", context)
 
@@ -539,13 +536,12 @@ def add_remark(request, complaint_id):
         return render(request, 'error_templates/403.html', status=403)
 
 
-class RemarkAddedDone(LoginRequiredMixin, DetailView):
-    model = Complaint
+class RemarkAddedDone(LoginRequiredMixin, TemplateView):
     context_object_name = "complaint"
     template_name = "complaints/remark_add_done.html"
 
-
-class RemarkDetailView(LoginRequiredMixin, DetailView):
+class RemarkDetailView(PermissionRequiredMixin, DetailView):
+    permission_required = 'complaints.view_remark'
     model = Remark
     template_name = "complaints/remark_details.html"
     context_object_name = "remark"

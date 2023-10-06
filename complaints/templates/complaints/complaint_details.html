@@ -100,22 +100,22 @@
               <li class="list-group-item m-1 bg-light border-secondary rounded active">
                 <small>
                 <div class="row justify-content-between">
-                  <div class="col-sm-9 text-dark font-weight-bold">
+                  <div class="col-sm-8 text-dark font-weight-bold">
                     Remark By: {{ remark.respondent|capfirst }}
                   </div>
                   {% if request.user == remark.respondent and latest_status != "Closed" %}
                   <div class="col-sm-1 justify-content-center ">
-                    <abbr class="col-sm-2" title="delete Remark">
-                      <a hx-get="{% url 'complaints:delete_remark' remark.pk %}" hx-target="#dialog" class="btn shadow btn-white m-1 btn-sm">
+                    <abbr class="col-sm-1" title="delete Remark">
+                      <a hx-get="{% url 'complaints:delete_remark' remark.pk %}" hx-target="#dialog" class="btn btn-sm">
                         <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
                       </a>
                     </abbr>
                   </div>
-                  <div class="col-sm-1">
+                  <div class="col-sm-1 m-1">
                     <a title="Edit" hx-get="{% url 'complaints:remark_update' remark.pk %}" hx-target="#dialog"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
                   </div>
                   {% endif %}
-                  <div class="col-sm-1">
+                  <div class="col-sm-1 m-1">
                     <a title="view details" hx-get="{% url 'complaints:view_remark_details' remark.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
                   </div>
                 </div>

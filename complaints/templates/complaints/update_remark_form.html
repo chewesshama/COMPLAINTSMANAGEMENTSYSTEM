@@ -2,10 +2,10 @@
 
 {% block form-content %}
 <h3 class="mb-4">Update Remark</h3>
-<form method="post" class="signup-form my-5">
+<form method="post" class="signup-form my-5" action="{% url 'complaints:remark_update' remark.pk %}">
   {% csrf_token %}
 
-  <div class="form-group">
+  <div class="form-group my-1">
     {{form.content.label_tag}} {{ form.content }}
     {% if form.content.errors %}
     <div class="alert alert-danger" role="alert">
@@ -13,7 +13,7 @@
     </div>
     {% endif %} 
   </div>
-  <div class="form-group">
+  <div class="form-group my-1">
     {{ form.attachment_type.label_tag }}
       {{ form.attachment_type }}
       {% if form.attachment_type.errors %}
@@ -23,7 +23,7 @@
       {% endif %}
       
   </div>
-  <div class="form-group">
+  <div class="form-group my-1">
     {{form.attachments.label_tag}} {{ form.attachments }}
     {% if form.attachmrents.errors %}
     <div class="alert alert-danger" role="alert">
@@ -31,7 +31,7 @@
     </div>
     {% endif %} 
   </div>
-  <div class="form-group">
+  <div class="form-group my-1">
     {{form.remark_targeted_department.label_tag}} 
     {{form.remark_targeted_department }}
     {% if form.remark_targeted_department.errors %}
@@ -41,7 +41,7 @@
     {% endif %} 
     
   </div>
-  <div class="form-group">
+  <div class="form-group my-1">
     {{form.remark_targeted_personnel.label_tag}} 
     {{ form.remark_targeted_personnel}}
     {% if form.remark_targeted_personnel.errors %}
@@ -51,7 +51,7 @@
     {% endif %} 
     
   </div>
-  <div class="form-group">
+  <div class="form-group my-1">
     {{form.status.label_tag}} {{ form.status }}
     {% if form.status.errors %}
     <div class="alert alert-danger" role="alert">{{ form.status.errors }}</div>

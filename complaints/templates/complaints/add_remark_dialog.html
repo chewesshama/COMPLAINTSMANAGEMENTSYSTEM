@@ -8,20 +8,20 @@
 <div class="modal-content border shadow">
     <small>
         <div class="modal-header border shadow">
-            <h3 class="modal-title">Add Complaint</h3>
+            <h3 class="modal-title">Add Remark</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body content-section border shadow">
 
-            <form method="post" class="signup-form" action="{% url 'complaints:add_remark' %}">
+            <form method="post" class="signup-form" action="{% url 'complaints:add_remark' complaint.pk %}">
             {% csrf_token %}
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.complaint.label_tag}} {{ form.complaint }}
                 {% if form.complaint.errors %}
                 <div class="alert alert-danger" role="alert">{{ form.complaint.errors }}</div>
                 {% endif %} 
             </div>
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.content.label_tag}} {{ form.content }}
                 {% if form.content.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -29,7 +29,7 @@
                 </div>
                 {% endif %} 
             </div>
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.attachments.label_tag}} {{ form.attachments }}
                 {% if form.attachmrents.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -37,7 +37,7 @@
                 </div>
                 {% endif %} 
             </div>
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.remark_targeted_department.label_tag}} 
                 {{form.remark_targeted_department }}
                 {% if form.remark_targeted_department.errors %}
@@ -47,7 +47,7 @@
                 {% endif %} 
                 
             </div>
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.remark_targeted_personnel.label_tag}} 
                 {{ form.remark_targeted_personnel}}
                 {% if form.remark_targeted_personnel.errors %}
@@ -57,18 +57,18 @@
                 {% endif %} 
                 
             </div>
-            <div class="form-group">
+            <div class="form-group my-1">
                 {{form.status.label_tag}} {{ form.status }}
                 {% if form.status.errors %}
                 <div class="alert alert-danger" role="alert">{{ form.status.errors }}</div>
                 {% endif %} 
             </div>
         </div>
-        <div class="modal-footer py-5">
+        <div class="modal-footer py-5 my-1">
             <div class="form-group d-flex justify-content-end mb-3">
                 <abbr title="submit">
                 <button type="submit" class="btn btn-primary submit" style="background-color: #e32249 !important; border: solid #e32249 !important;">
-                    <span class="fa fa-user-plus"></span>
+                    <span class="fa fa-check"></span>
                 </button>
                 </abbr>
             </div>

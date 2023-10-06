@@ -166,7 +166,7 @@
                         <div class="col-sm-4 text-dark font-weight-bold">
                           {{ department.name|upper }}
                         </div>
-                        <div class="col-sm-1 justify-content-center ">
+                        <div class="col-sm-1 justify-content-center m-2">
                           <abbr class="col-sm-1" title="delete department">
                             <a hx-get="{% url 'complaints:department_delete' department.pk %}" hx-target="#dialog" class="btn btn-sm">
                               <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
@@ -336,7 +336,8 @@
                         </button>
                     </td>
                     <td>
-                        <button type="submit" class="btn btn-white m-1 btn-sm">
+                        <button type="submit" class="btn btn-white m-1 btn-sm" {% if perm.complaint.delete_user %} disabled                           
+                        {% endif %}>
                           <abbr title="Delete Profile">
                             <i class="fa fa-remove" style="font-size:20px; color:red; cursor: pointer;"></i>
                           </abbr>
