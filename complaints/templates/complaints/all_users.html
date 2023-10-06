@@ -30,14 +30,16 @@
             </abbr>
           </div>
           <div class="col-sm-3 d-flex">
-            <form method="get">
-              <div class="input-group">
-                <div class="form-outline">{{ user_search_form.search_query }}</div>
-                <button id="search-button" type="button" class="btn btn-secondary">
+          <form method="get" class="form-inline my-2 my-lg-0">
+            <div class="input-group">
+              {{ user_search_form.search_query }}
+              <div class="input-group-append">
+                <button id="search-button" type="submit" class="btn rounded btn-outline-secondary">
                   <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
               </div>
-            </form>
+            </div>
+          </form>
           </div>
         </div>
       </section>
@@ -133,11 +135,11 @@
                         </button>
                     </td>
                     <td>
-                        <button type="submit" class="btn btn-white m-1 btn-sm">
-                          <abbr title="Delete Profile">
-                            <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
-                          </abbr>
-                        </button>
+                    <abbr class="m-1" title="delete User">
+                      <a hx-get="{% url 'complaints:delete_user' user.pk %}" hx-target="#dialog" class="btn shadow btn-white m-1 btn-sm">
+                        <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
+                      </a>
+                    </abbr>
                       {% endif %}
                     </td>
                   </tr>
@@ -156,15 +158,35 @@
                 </div>
               </nav>
               <hr>
-              <table class="table table-hover">
-                <tbody>
-                  {% for department in departments %}
-                    <tr>
-                      <th scope="row">{{ department.name|upper }}</th>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                {% for department in departments %}
+                  <ul class="list-group my-1 pb-3">
+                    <li class="list-group-item m-1 bg-light border-secondary rounded active">
+                      <small>
+                      <div class="row justify-content-between p-2 align-items-center">
+                        <div class="col-sm-4 text-dark font-weight-bold">
+                          {{ department.name|upper }}
+                        </div>
+                        <div class="col-sm-1 justify-content-center ">
+                          <abbr class="col-sm-1" title="delete department">
+                            <a hx-get="{% url 'complaints:department_delete' department.pk %}" hx-target="#dialog" class="btn btn-sm">
+                              <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
+                            </a>
+                          </abbr>
+                        </div>
+                        <div class="col-sm-1">
+                          <a title="Edit" hx-get="{% url 'complaints:department_update' department.pk %}" hx-target="#dialog"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                        </div>
+                        <div class="col-sm-1">
+                          <a title="view details" hx-get="{% url 'complaints:department_details' department.pk %}" hx-target="#dialog"><i class="fa fa-eye" style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                        </div>
+                      </div>
+                      </small>
+                    </li>
+                  </ul>
+                {% endfor %}
+                <button class="btn text-dark shadow btn-secondary btn-sm my-2">
+                  <a hx-get="{% url 'complaints:department_create'%}" hx-target="#dialog" class="nav-link text-light">Add</a>
+                </button>
             </section>
 
             <section class="border p-4 mt-5 d-flex flex-column shadow">

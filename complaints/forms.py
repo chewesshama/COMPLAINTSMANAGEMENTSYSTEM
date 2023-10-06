@@ -4,9 +4,30 @@ from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
 )
+from multiupload.fields import MultiMediaField
+
+# from multiupload.widgets import MultiFileInput
 from .models import Remark, User, Department, Complaint
 from django.contrib.auth.models import Group
 from mtaa import tanzania, districts
+
+
+class DepartmentForm(forms.ModelForm):
+    name = forms.CharField(
+        label="name", widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    description = forms.CharField(
+        label="description",
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = Department
+        fields = [
+            "name",
+            "description",
+        ]
 
 
 class CEORegistrationForm(UserCreationForm):
@@ -110,8 +131,6 @@ class LoginForm(AuthenticationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    #REGION_CHOICES = [(region, region) for region in tanzania]
-
     first_name = forms.CharField(
         label="firstname", widget=forms.TextInput(attrs={"class": "form-control"})
     )
@@ -134,37 +153,15 @@ class UserProfileForm(forms.ModelForm):
 
     region = forms.CharField(
         label="Region",
-        #choices=[(region, region) for region in tanzania],
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
     district = forms.CharField(
         label="District",
-        #choices=[(district, district) for district in districts],
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-
-#    def __init__(self, *args, **kwargs):
-#        super(UserProfileForm, self).__init__(*args, **kwargs)
-#
-#        self.fields["region"].choices = [("", "Select a Region")] + [
-#            (region, region) for region in tanzania
-#        ]
-#
-#        if "instance" in kwargs and kwargs["instance"]:
-#            instance = kwargs["instance"]
-#            if instance.region:
-#                selected_region = instance.region
-#                if hasattr(tanzania, selected_region):
-#                    if hasattr(region, "districts"):
-#                        districts = [
-#                            (district, district) for district in region.districts
-#                        ]
-#                        self.fields["district"].choices = [
-#                            ("", "Select a District")
-#                        ] + districts
 
     phone_number = forms.CharField(
         label="phone number", widget=forms.TextInput(attrs={"class": "form-control"})
@@ -188,7 +185,15 @@ class SearchForm(forms.Form):
     search_query = forms.CharField(
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Search...",
+                "data-toggle": "tooltip",
+                "title": "Enter your search here",
+            }
+        ),
+        label="Search",
     )
 
 
@@ -229,11 +234,21 @@ class AddComplaintForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control"}),
     )
 
-    attachments = forms.FileField(
-        required=False,
-        widget=forms.ClearableFileInput(
-            attrs={"class": "form-control"}
-        ),
+    #    attachments = MultiMediaField(
+    #        min_num=1,
+    #        max_num=5,
+    #        max_file_size=1024 * 1024 * 5,
+    #        widget=MultiFileInput(attrs={"accept": "image/*,audio/*,video/*,application/pdf"}),
+    #        label="attachments",
+    #        required=False,
+    #    )
+
+    attachments = MultiMediaField(
+        min_num=1,
+        max_num=5,
+        max_file_size=1024 * 1024 * 5,
+        media_type="image",  # 'audio', 'video' or 'image'
+        widget=forms.ClearableFileInput(attrs={"class": "form-control"}),
     )
 
     targeted_personnel = forms.ModelChoiceField(
@@ -249,14 +264,14 @@ class AddComplaintForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
     )
 
-#    def __init__(self, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#
-#        if "targeted_department" in self.data:
-#            department_id = int(self.data.get("targeted_department"))
-#            self.fields["targeted_personnel"].queryset = User.objects.filter(
-#                department_id=department_id
-#            )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if "targeted_department" in self.data:
+            department_id = int(self.data.get("targeted_department"))
+            self.fields["targeted_personnel"].queryset = User.objects.filter(
+                department_id=department_id
+            )
 
     STATUS_CHOICES = (
         ("Opened", "Opened"),
@@ -305,11 +320,12 @@ class AddRemarkForm(forms.ModelForm):
         label="description", widget=forms.Textarea(attrs={"class": "form-control"})
     )
 
-    attachments = forms.FileField(
-        required=False,
-        widget=forms.ClearableFileInput(
-            attrs={"class": "form-control"}
-        ),
+    attachments = MultiMediaField(
+        min_num=1,
+        max_num=5,
+        max_file_size=1024 * 1024 * 5,
+        media_type="image",  # 'audio', 'video' or 'image'
+        widget=forms.ClearableFileInput(attrs={"class": "form-control"}),
     )
 
     remark_targeted_personnel = forms.ModelChoiceField(

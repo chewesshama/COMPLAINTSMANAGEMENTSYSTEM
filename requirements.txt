@@ -1,8 +1,9 @@
 asgiref==3.7.2
-Django==3.2.8
+Django==4.2.5
 django-crispy-forms==2.0
 django-htmx==1.16.0
 django-mikoa==0.0.3
+django-multiupload==0.6.1
 django-widget-tweaks==1.5.0
 mtaa==1.5
 mysqlclient==2.2.0

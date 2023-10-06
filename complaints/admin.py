@@ -5,7 +5,6 @@ from .models import (
     Complaint,
     Department,
     Remark,
-    ComplaintAttachments,
     DepartmentHistory,
 )
 
@@ -45,7 +44,6 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(Department)
 admin.site.register(Complaint)
 admin.site.register(Remark)
-admin.site.register(ComplaintAttachments)
 admin.site.register(DepartmentHistory)
 
 

@@ -18,8 +18,9 @@ from django.db.models import Q, Subquery
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseForbidden, JsonResponse, Http404
 from mtaa import tanzania
-from .models import Complaint, Department, Remark, User, ComplaintAttachments
+from .models import Complaint, Department, Remark, User
 from .forms import (
+    DepartmentForm,
     UserProfileForm,
     CEORegistrationForm,
     HODRegistrationForm,
@@ -33,31 +34,6 @@ from .forms import (
 )
 from django.core.exceptions import PermissionDenied
 
-
-# def get_department(request):
-#    departments = Department.objects.all()
-#    context = {"departments": departments}
-#    return render(request, "complaints/add_remark.html", context)
-#
-#
-# def get_users(request):
-#    department = request.GET.get('department')
-#    users = User.objects.get(department=department)
-#    context = {"users": users}
-#    return render(request, "complaints/department_members_options.html", context)
-
-
-# def get_districts(request):
-#    region_name = request.GET.get("region_name")
-#
-#    if hasattr(tanzania, region_name):
-#
-#        if hasattr(region, "districts"):
-#            districts = region.districts
-#            district_names = [district for district in districts]
-#            return JsonResponse(district_names, safe=False)
-#
-#    return JsonResponse([], safe=False)
 
 
 def custom_404_view(request, exception=None):
@@ -193,6 +169,7 @@ def userProfileUpdateView(request, pk):
 class DeleteUserView(PermissionRequiredMixin, DeleteView):
     permission_required = "complaints.delete_user"
     model = User
+    template_name = "complaints/user_delete_confirm_dialog.html"
     success_url = reverse_lazy("complaints:all_users_display")
 
     def get_object(self, queryset=None):
@@ -383,6 +360,7 @@ class UserComplaintsDisplayView(LoginRequiredMixin, ListView):
 class DeleteComplaintView(PermissionRequiredMixin, DeleteView):
     permission_required = "complaints.delete_complaint"
     model = Complaint
+    template_name = "complaints/user_delete_confirm_dialog.html"
     success_url = reverse_lazy("complaints:user_complaints_display")
 
     def get_object(self, queryset=None):
@@ -399,7 +377,7 @@ class UpdateComplaintView(PermissionRequiredMixin, UpdateView):
     permission_required = "complaints.change_complaint"
     model = Complaint
     form_class = UpdateComplaintForm
-    template_name = "complaints/update_complaint_form.html"
+    template_name = "complaints/update_complaint_dialog.html"
     context_object_name = "complaint"
 
     def get_success_url(self):
@@ -471,14 +449,6 @@ def add_complaint(request):
     if request.method == "POST":
         form = AddComplaintForm(request.POST, request.FILES)
         if form.is_valid():
-            attachments = []
-            for attachment in request.FILES.getlist("attachments"):
-                ComplaintAttachments.objects.create(
-                    file=attachment,
-                    description=attachment.name,
-                    content_type=attachment.content_type,
-                    uploaded_by=request.user,
-                )
             complaint = Complaint(
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
@@ -489,7 +459,14 @@ def add_complaint(request):
             )
 
             complaint.save()
-            complaint.attachments.set(attachments)
+            
+            for uploaded_file in request.FILES.getlist('attachments'):
+                attachment = Complaint(
+                    attachments=uploaded_file,
+                )
+                attachment.save()
+                complaint.attachments.add(attachment)
+
             return redirect("complaints:user_complaints_display")
 
     else:
@@ -527,56 +504,6 @@ def add_remark(request, complaint_id):
                 request.POST, request.FILES, initial={"complaint": complaint}
             )
             if form.is_valid():
-                attachment_type = form.cleaned_data["attachment_type"]
-                attachments = []
-
-                if attachment_type == "picture":
-                    picture = request.FILES.get("picture")
-                    if picture:
-                        attachment = ComplaintAttachments(picture=picture)
-                        attachment.save()
-                        attachments.append(attachment)
-                elif attachment_type == "voice":
-                    voice = request.FILES.get("voice")
-                    if voice:
-                        attachment = ComplaintAttachments(voice=voice)
-                        attachment.save()
-                        attachments.append(attachment)
-                elif attachment_type == "video":
-                    video = request.FILES.get("video")
-                    if video:
-                        attachment = ComplaintAttachments(video=video)
-                        attachment.save()
-                        attachments.append(attachment)
-                elif attachment_type == "file":
-                    file = request.FILES.get("file")
-                    if file:
-                        attachment = ComplaintAttachments(file=file)
-                        attachment.save()
-                        attachments.append(attachment)
-                elif attachment_type == "all":
-                    picture = request.FILES.get("picture")
-                    video = request.FILES.get("video")
-                    voice = request.FILES.get("voice")
-                    file = request.FILES.get("file")
-
-                    if picture:
-                        attachment = ComplaintAttachments(picture=picture)
-                        attachment.save()
-                        attachments.append(attachment)
-                    if video:
-                        attachment = ComplaintAttachments(video=video)
-                        attachment.save()
-                        attachments.append(attachment)
-                    if voice:
-                        attachment = ComplaintAttachments(voice=voice)
-                        attachment.save()
-                        attachments.append(attachment)
-                    if file:
-                        attachment = ComplaintAttachments(file=file)
-                        attachment.save()
-                        attachments.append(attachment)
-
                 remark = Remark(
                     complaint=form.cleaned_data["complaint"],
                     content=form.cleaned_data["content"],
@@ -589,19 +516,24 @@ def add_remark(request, complaint_id):
                     ],
                     status=form.cleaned_data["status"],
                 )
-
                 remark.save()
-                remark.attachments.set(attachments)
 
-                complaint = form.cleaned_data["complaint"]
+                for uploaded_file in request.FILES.getlist('attachments'):
+                    attachment = Remark(
+                        attachments=uploaded_file,
+                    )
+                    attachment.save()
+                    remark.attachments.add(attachment)
 
                 url = reverse("complaints:remark_added_done", args=[complaint.pk])
                 return redirect(url)
         else:
             form = AddRemarkForm(initial={"complaint": complaint})
 
-        context = {"form": form}
-        return render(request, "complaints/add_remark.html", context)
+#        context = {"form": form}
+#        return render(request, "complaints/add_remark_dialog.html", context)
+        context = {"complaint": complaint, "form": form}
+        return render(request, "complaints/add_remark_dialog.html", context)
 
     else:
         return render(request, 'error_templates/403.html', status=403)
@@ -645,7 +577,6 @@ class RemarkDetailView(LoginRequiredMixin, DetailView):
         ):
             return remark
         else:
-            print("You are not allowed to view this remark.")
             raise Http404("You are not allowed to view this remark.")
 
 
@@ -653,7 +584,7 @@ class UpdateRemarkView(PermissionRequiredMixin, UpdateView):
     permission_required = "complaints.change_remark"
     model = Remark
     form_class = UpdateRemarkForm
-    template_name = "complaints/update_remark_form.html"
+    template_name = "complaints/update_remark_dialog.html"
     context_object_name = "remark"
 
     def get_object(self, queryset=None):
@@ -673,6 +604,7 @@ class UpdateRemarkView(PermissionRequiredMixin, UpdateView):
 
 class DeleteRemarkView(PermissionRequiredMixin, DeleteView):
     permission_required = "complaints.delete_remark"
+    template_name = "complaints/remark_delete_confirm_dialog.html"
     model = Remark
 
     def get_object(self, queryset=None):
@@ -709,3 +641,81 @@ class StaffUserProfileView(PermissionRequiredMixin, DetailView):
         if not has_special_permission(request.user):
             raise PermissionDenied
         return super().get(request, *args, **kwargs)
+
+
+def ceo_special_permission(user):
+    if (
+        user.is_superuser
+        or user.groups.filter(name="CEO").exists()
+    ):
+        return True
+    return False
+
+
+class DepartmentDetailsView(PermissionRequiredMixin, DetailView):
+    permission_required = 'complaints.view_department'
+    model = Department
+    template_name = 'complaints/department_details_dialog.html'
+    
+    def get(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+
+class DepartmentCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = 'complaints.add_department'
+    model = Department
+    form_class = DepartmentForm
+    template_name = 'complaints/department_creation_form_dialog.html'
+    success_url = reverse_lazy('complaints:all_users_display')
+    
+    def get(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().post(request, *args, **kwargs)
+
+
+
+class DepartmentUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'complaints.change_department'
+    model = Department
+    form_class = DepartmentForm
+    template_name = 'complaints/department_update_dialog.html'
+    success_url = reverse_lazy('complaints:all_users_display')
+    
+    def get(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().post(request, *args, **kwargs)
+
+
+
+class DepartmentDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = 'complaints.delete_department'
+    model = Department
+    template_name = 'complaints/department_delete_dialog.html'
+    success_url = reverse_lazy('complaints:all_users_display')
+    
+    def get(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not ceo_special_permission(request.user):
+            raise PermissionDenied
+        return super().post(request, *args, **kwargs)
+
+
+

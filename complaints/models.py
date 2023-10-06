@@ -38,23 +38,11 @@ class User(AbstractUser):
         return self.username
 
 
-class ComplaintAttachments(models.Model):
-    file = models.FileField(upload_to='complaint_pictures/', null=True, blank=True)
-    description = models.CharField(max_length=255, null=True, blank=True)
-    content_type = models.CharField(max_length=100, null=True, blank=True)
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    uploaded_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.picture.url}"
-
-
-
 class Complaint(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     complainant = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    attachments = models.ManyToManyField(ComplaintAttachments)
+    attachments = models.FileField(upload_to='complaint_attachments/', blank=True, null=True)
     targeted_department = models.ForeignKey(Department, related_name="complaint_department", on_delete=models.CASCADE)
     targeted_personnel = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="complaints_targeted"
@@ -88,7 +76,7 @@ class Remark(models.Model):
     respondent = models.ForeignKey(User, on_delete=models.CASCADE)
     complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name="remarks")
     content = models.TextField()
-    attachments = models.ManyToManyField(ComplaintAttachments)
+    attachments = models.FileField(upload_to='remark_attachments/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Opened")
     remark_targeted_personnel = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="remark_target", default=1
@@ -104,8 +92,7 @@ class Remark(models.Model):
         super(Remark, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{ self.complaint }  -  {self.content},  by  {self.respondent}"
-
+        return f"Remark for Complaint {self.complaint.title}"
 
 class DepartmentHistory(models.Model):
     complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE)

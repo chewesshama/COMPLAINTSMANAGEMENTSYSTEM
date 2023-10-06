@@ -21,12 +21,14 @@
               >
             </button>
           </div>
-          <form method="get">
+          <form method="get" class="form-inline my-2 my-lg-0">
             <div class="input-group">
-              <div class="form-outline">{{ user_search_form.search_query }}</div>
-              <button id="search-button" type="submit" class="btn rounded btn-secondary">
-                <i class="fa fa-search" aria-hidden="true"></i>
-              </button>
+              {{ user_search_form.search_query }}
+              <div class="input-group-append">
+                <button id="search-button" type="submit" class="btn rounded btn-outline-secondary">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -110,17 +112,19 @@
               <button class="btn rounded text-white bg-secondary btn-sm shadow-sm" >
                 <a
                   href="{% url 'complaints:user_complaints_display' %}"
-                  class="nav-link"
+                  class="nav-link p-3"
                   >MY COMPLAINTS</a
                 >
               </button>
             </div>
-            <form method="get">
+            <form method="get" class="form-inline my-2 my-lg-0">
               <div class="input-group">
-                <div class="form-outline">{{ user_search_form.search_query }}</div>
-                <button id="search-button" type="submit" class="btn rounded btn-secondary">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-                </button>
+                {{ user_search_form.search_query }}
+                <div class="input-group-append">
+                  <button id="search-button" type="submit" class="btn rounded btn-outline-secondary">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
             </form>
           </div>

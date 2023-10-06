@@ -13,18 +13,15 @@
                 <div class="col-sm-11">
                   Complaint Details
                 </div>             
+                {% if latest_status == 'Closed' %}
                 <div class="col-sm-1">
-                  <form action="{% url 'complaints:delete_complaint' complaint.pk %}" method="POST">
-                    {% csrf_token %}
-                      {% if latest_status == 'Closed' %}
-                      <abbr class="col-sm-2" title="delete Complaint">
-                        <button type="submit" class="btn shadow btn-white m-1 btn-sm">
-                          <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
-                        </button>
-                      </abbr>
-                    {% endif %}
-                  </form>
+                  <abbr class="col-sm-2" title="delete Complaint">
+                    <a hx-get="{% url 'complaints:delete_complaint' complaint.pk %}" hx-target="#dialog" class="btn shadow btn-white m-1 btn-sm">
+                      <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
+                    </a>
+                  </abbr>
                 </div>
+                {% endif %}
             </div>
             </li>
             <table class="table my-3">
@@ -59,7 +56,8 @@
                       <tr>
                         <td>
                           <button class="btn text-light btn-sm btn-secondary shadow">
-                            <a href="{% url 'complaints:update_complaint' complaint.pk %}"
+                            <a hx-get="{% url 'complaints:update_complaint' complaint.pk %}"
+                              hx-target="#dialog"
                               class="nav-link text-light"
                               >Update</a>
                           </button>
@@ -75,8 +73,9 @@
                       <tr>
                         <td>
                           <button class="btn text-light btn-sm btn-secondary shadow">
-                            <a href="{% url 'complaints:update_complaint' complaint.pk %}"
+                            <a hx-get="{% url 'complaints:update_complaint' complaint.pk %}"
                               class="nav-link text-light"
+                              hx-target="#dialog"
                               >Update</a>
                           </button>
                         </td>
@@ -106,17 +105,14 @@
                   </div>
                   {% if request.user == remark.respondent and latest_status != "Closed" %}
                   <div class="col-sm-1 justify-content-center ">
-                    <form action="{% url 'complaints:delete_remark' remark.pk %}" method="POST">
-                      {% csrf_token %}
-                        <abbr title="delete Remark">
-                          <button type="submit" class="btn btn-white btn-sm p-0">
-                            <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
-                          </button>
-                        </abbr>
-                    </form>
+                    <abbr class="col-sm-2" title="delete Remark">
+                      <a hx-get="{% url 'complaints:delete_remark' remark.pk %}" hx-target="#dialog" class="btn shadow btn-white m-1 btn-sm">
+                        <i class="fa fa-remove" style="font-size:20px; color:#e32249; cursor: pointer;"></i>
+                      </a>
+                    </abbr>
                   </div>
                   <div class="col-sm-1">
-                    <a title="Edit" href="{% url 'complaints:remark_update' remark.pk %}"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
+                    <a title="Edit" hx-get="{% url 'complaints:remark_update' remark.pk %}" hx-target="#dialog"><i class="fa fa-pencil " style="color: #6c757d; cursor: pointer; font-size: 20px;" aria-hidden="true"></i></a>
                   </div>
                   {% endif %}
                   <div class="col-sm-1">
@@ -134,7 +130,7 @@
 
           {% if latest_status != "Closed" %}
               <button class="btn text-dark shadow btn-secondary btn-sm my-2">
-                <a href="{% url 'complaints:add_remark' complaint_id=complaint.pk %}" class="nav-link text-light">Add Remark</a>
+                <a hx-get="{% url 'complaints:add_remark' complaint.pk %}" hx-target="#dialog" class="nav-link text-light">Add Remark</a>
               </button>
           {% endif %}
         </div>

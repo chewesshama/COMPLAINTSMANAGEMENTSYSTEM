@@ -1,0 +1,35 @@
+{% extends "complaints/dialog.html" %}
+{% load static %}
+
+{% block dialog-content %}
+<!-- Modal -->
+<div class="modal-content border shadow">
+    <small>
+    <div class="modal-header border shadow">
+        <h5 class="modal-title text-center" id="exampleModalLongTitle">Department Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body content-section border shadow">
+        <div class="media ">
+            <div class="media-body">
+            <h2 class="account-heading my-2">
+                {{department.name|upper}}
+            </h2>
+            <table class="table my-4">
+                <tbody>
+                  <tr>
+                      <th scope="row">Name :</th>
+                      <td>{{department.name|upper}}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Descriptions :</th>
+                    <td>{{department.description|capfirst}}</td>
+                  </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    </small>
+</div>
+{% endblock dialog-content %}
